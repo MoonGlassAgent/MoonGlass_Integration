@@ -245,6 +245,7 @@ a:hover { color: var(--accent); }
 .panel.agent .art { background: linear-gradient(145deg, #efe0ff, #e0f8ff); }
 .panel.gate .art { background: linear-gradient(145deg, #e0ffe8, #fffde0); }
 .panel.cameo .art { background: linear-gradient(145deg, #ffe8f0, #e8f0ff); }
+.panel.why .art { background: linear-gradient(145deg, #e8ecff, #fff0e8); }
 .panel.boundary .art { background: linear-gradient(145deg, #fff0e0, #e0ffe8); }
 .panel.cta-panel .art { background: linear-gradient(145deg, #ffe66d33, #4ecdc433); }
 

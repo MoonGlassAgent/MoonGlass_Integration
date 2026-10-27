@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7-draft — 2026-10-27
+
+- **定位叙事：** 说明为什么「规则包 + Agent」可在工作方式上替代传统 SoC 集成工具——传统工具（IP-XACT / BD / coreAssembler 等）本质仍是信号关系的文本/结构化描述；本包用 YAML 契约说清同样关系，由 Agent 当场 elaborator，不必养永久 GUI/集成器。**不**声称法律/专利豁免；边界仍是「非永久集成器」。
+- Comic site：新增第 6 格 punchline；说明 HTML / README 补短 callout；Pages 同步。
+
 ## 0.1.6-draft — 2026-10-27
 
 - **连连看（NL ↔ fields）：** `rules/nl_field_map.md` — match-style table: Chinese/English intent phrases → Must/Optional YAML field paths → Done checks (M1–M13: port, bundle, address map, clk/rst, pads, CDC, fabric decode_mux, adapters, bit-slice, bus_role strategy A, add IP, params, IRQ).

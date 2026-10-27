@@ -9,17 +9,19 @@
 **规则 / Schema / 约束包** —— 让任意 coding agent 靠 YAML 描述做 SoC 组装与连线。  
 **不是**集成引擎，**不是** MoonGlass 产品内的接线功能。
 
-**English (short):** A description-driven SoC assembly rules pack. Agents read IP / subsystem / SoC YAML contracts, validate, then elaborate top RTL. AI may invent one-off helpers; we do not ship a heavyweight integrator. Thin schema validator only.
+**为什么能替代传统集成工具（工作方式上）：** IP-XACT / Block Design / coreAssembler 一类，本质上仍是**信号关系的文本/结构化描述**；GUI 多半是同一份关系的另一张皮。本包用自研 YAML 契约把同样的关系说清楚，再交给 **Agent 当场 elaborator**，不必养一个永久 GUI/集成器产品。这是定位说明，**不**声称法律或专利豁免。
+
+**English (short):** A description-driven SoC assembly rules pack. Traditional integrators are still signal-relationship text; YAML contracts + Agent-as-Elaborator replace the forever-GUI workflow (not a legal/patent claim). Thin schema validator only; we do not ship a heavyweight integrator.
 
 ## 是什么 / 不是什么
 
 | 是 | 不是 |
 |----|------|
-| IP / Subsystem / SoC 的 JSON Schema + 约定 | FuseSoC / IP-XACT 替代品（刻意不做） |
+| IP / Subsystem / SoC 的 JSON Schema + 约定 | 永久 GUI / 重型 elaborator 产品 |
 | Agent 可读的 `AGENTS.md` / `CLAUDE.md` / `.cursorrules` | MoonGlass 里跑集成的功能模块 |
-| 示例 YAML + 校验脚本 | 永久的“集成工具产品” |
+| 示例 YAML + 校验脚本 | 厂商格式克隆或互换器（IP-XACT 等刻意不做） |
 
-协议与结构清楚之后，上层 Agent（Workbuddy、Claude Code、DeepSeek harness、Pi、Cursor…）自由度很大；需要时现场写 glue 即可。
+协议与结构清楚之后，上层 Agent（Workbuddy、Claude Code、DeepSeek harness、Pi、Cursor…）自由度很大；需要时现场写 glue 即可。传统工具维护的仍是「信号怎么连」这份关系——本包把关系写进 YAML，由 Agent 展开。
 
 ## 怎么用
 
@@ -78,4 +80,4 @@ MoonGlass 适合**托住**这类规则/描述与状态；**不适合**在本包�
 
 ## Version
 
-见 `VERSION`（当前 `0.1.6-draft`）与 `CHANGELOG.md`。
+见 `VERSION`（当前 `0.1.7-draft`）与 `CHANGELOG.md`。

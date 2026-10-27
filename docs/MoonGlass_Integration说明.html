@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MoonGlass_Integration 说明 — 0.1.6-draft</title>
+<title>MoonGlass_Integration 说明 — 0.1.7-draft</title>
 <style>
   :root {
     --bg: #f6f7f9;
@@ -312,7 +312,7 @@
 <div class="layout">
 <nav class="toc" aria-label="目录">
   <div class="brand">MoonGlass_Integration</div>
-  <div class="ver">说明文档 · 0.1.6-draft</div>
+  <div class="ver">说明文档 · 0.1.7-draft</div>
   <h2>目录</h2>
   <ol>
     <li><a href="#定位与边界">定位与边界</a></li>
@@ -348,7 +348,7 @@
     <tbody>
       <tr>
         <td>IP / Subsystem / SoC 的 JSON Schema + 命名与连线约定</td>
-        <td>FuseSoC / IP-XACT / Vivado IPI 的替代品（刻意不做）</td>
+        <td>永久 GUI / 厂商格式互换器（IP-XACT 等刻意不做克隆）</td>
       </tr>
       <tr>
         <td>Agent 可读的 <code>AGENTS.md</code> / <code>CLAUDE.md</code> / <code>.cursorrules</code></td>
@@ -363,9 +363,13 @@
   </div>
   <h3>与 MoonGlass 的关系</h3>
   <p>MoonGlass 适合<strong>托住</strong>这类规则、描述与状态（托管 / 检查契约）。本包<strong>不</strong>在 MoonGlass 内执行 SoC 接线。社区可先挂这套组建拉讨论与流量，与核心产品解耦。任意 coding agent 都可按本规则包执行集成。</p>
+  <div class="callout ok">
+    <strong>为什么 +Agent 可以替代传统集成工具（工作方式上）</strong>
+    IP-XACT、Block Design、coreAssembler 一类工具，本质上仍是在维护<strong>信号关系的文本 / 结构化描述</strong>；GUI 多半是同一份关系的另一张皮。本包用自研 YAML 契约把同样的关系说清楚，再交给 <strong>Agent 当场 elaborator</strong>——不必养一个永久 GUI / 集成器产品。这是工程定位说明，<strong>不</strong>声称法律或专利豁免；也不做厂商格式互换。
+  </div>
   <div class="callout warn">
     <strong>边界一句话</strong>
-    本仓库交付的是「契约 + 规则 + 薄校验」；RTL 展开与 glue 由 Agent 按 YAML 现场完成，不在本包产品化。
+    本仓库交付的是「契约 + 规则 + 薄校验」；RTL 展开与 glue 由 Agent 按 YAML 现场完成，不在本包产品化。可以「替代」的是那套重型集成器工作流，不是去克隆某厂商产品。
   </div>
 </section>
 
@@ -799,7 +803,7 @@ python3 -m venv .venv
 
   <div class="callout gap">
     <strong>读缺口时请记住</strong>
-    「缺」≠「漏」。0.1.6-draft：契约可读、单文件 + 跨文件闭包可校验、场景可映射、<strong>连连看</strong>可匹配必填字段、Agent 有清晰禁区——而不是假装已是全功能 SoC 装配器。
+    「缺」≠「漏」。0.1.7-draft：契约可读、单文件 + 跨文件闭包可校验、场景可映射、<strong>连连看</strong>可匹配必填字段、Agent 有清晰禁区——而不是假装已是全功能 SoC 装配器。
   </div>
 </section>
 
@@ -810,7 +814,7 @@ python3 -m venv .venv
   <table>
     <thead><tr><th>项</th><th>值</th></tr></thead>
     <tbody>
-      <tr><td>包版本</td><td><code>0.1.6-draft</code>（见 <a href="../VERSION"><code>VERSION</code></a>、<a href="../CHANGELOG.md"><code>CHANGELOG.md</code></a>）</td></tr>
+      <tr><td>包版本</td><td><code>0.1.7-draft</code>（见 <a href="../VERSION"><code>VERSION</code></a>、<a href="../CHANGELOG.md"><code>CHANGELOG.md</code></a>）</td></tr>
       <tr><td>本说明 HTML</td><td><code>/workspace/MoonGlass_Integration/docs/MoonGlass_Integration说明.html</code></td></tr>
       <tr><td>仓库根（本机）</td><td><code>/workspace/MoonGlass_Integration/</code></td></tr>
       <tr><td>Agent brief</td><td><a href="../AGENTS.md"><code>../AGENTS.md</code></a></td></tr>
@@ -825,7 +829,7 @@ python3 -m venv .venv
 </section>
 
 <footer class="page-foot">
-  MoonGlass_Integration · 说明文档 · 0.1.6-draft · 单文件自包含 · 请以 schemas/ 与 AGENTS.md 为执行真源
+  MoonGlass_Integration · 说明文档 · 0.1.7-draft · 单文件自包含 · 请以 schemas/ 与 AGENTS.md 为执行真源
 </footer>
 </main>
 </div>
