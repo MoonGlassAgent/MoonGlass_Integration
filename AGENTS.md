@@ -2,7 +2,7 @@
 
 You are assembling / wiring a chip design from **YAML contracts**, not inventing a new integration product.
 
-Working title was sometimes misspelled *MoonGlass_Intergration*; the real name is **MoonGlass_Integration**.
+Pack / repo name: **MoonGlass_Integration**.
 
 ## What you do
 
