@@ -1,0 +1,52 @@
+kind: ip
+name: picosoc_mem
+version: 0.1.0
+description: >
+  Scratchpad SRAM in picosoc.v — wen/addr/wdata/rdata (no valid/ready).
+  SoC creates ram_ready one cycle later. Not a picorv32_mem target without glue.
+hdl:
+  module: picosoc_mem
+  files:
+    - https://github.com/YosysHQ/picorv32/blob/ef203c2b0a3fb793280f5114941416c425c5b461/picosoc/picosoc.v
+parameters:
+  WORDS:
+    type: int
+    default: 256
+clocks:
+  - name: clk
+    frequency_hz: null
+ports:
+  - name: wen
+    dir: in
+    width: 4
+    protocol: picosoc_sram
+    role: wen
+    clock_domain: clk
+    cdc: none
+  - name: addr
+    dir: in
+    width: 22
+    protocol: picosoc_sram
+    role: addr
+    clock_domain: clk
+    cdc: none
+    description: Word address; SoC ties mem_addr[23:2]
+  - name: wdata
+    dir: in
+    width: 32
+    protocol: picosoc_sram
+    role: wdata
+    clock_domain: clk
+    cdc: none
+  - name: rdata
+    dir: out
+    width: 32
+    protocol: picosoc_sram
+    role: rdata
+    clock_domain: clk
+    cdc: none
+memory_maps:
+  - name: sram
+    bus: picosoc_sram
+    base_offset: 0
+    size_bytes: 1024

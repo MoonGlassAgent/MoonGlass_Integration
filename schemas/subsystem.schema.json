@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moonglass.local/schemas/subsystem.schema.json",
+  "title": "MoonGlass_Integration subsystem",
+  "description": "Groups IP instances, optionally wires internals, and exposes upward ports/contracts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "name",
+    "version",
+    "instances",
+    "exports"
+  ],
+  "properties": {
+    "kind": {
+      "const": "subsystem"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-z0-9.]+)?$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "instances": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "ip"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "Instance id unique within this subsystem."
+          },
+          "ip": {
+            "type": "string",
+            "description": "IP name or relative path to ip_interface YAML (without requiring extension)."
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "description": "Optional internal connections between instances.",
+      "items": {
+        "$ref": "#/$defs/link"
+      },
+      "default": []
+    },
+    "exports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ports"
+      ],
+      "properties": {
+        "clocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "maps_to": {
+                "type": "string",
+                "description": "instance.port or shared clock name"
+              }
+            }
+          }
+        },
+        "resets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "maps_to": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "dir",
+              "width"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "dir": {
+                "enum": [
+                  "in",
+                  "out",
+                  "inout"
+                ]
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "protocol": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "description": "Signal role within a protocol (e.g. psel, pready). Not initiator/target — use bus_role for that."
+              },
+              "bus_role": {
+                "type": "string",
+                "enum": [
+                  "initiator",
+                  "target",
+                  "monitor",
+                  "passthrough"
+                ],
+                "description": "Optional bus endpoint role for this exported port (initiator|target|monitor|passthrough). Distinct from role."
+              },
+              "bundle": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "description": "Optional logical bundle / interface group id (e.g. apb_s, uart_io). Ports sharing a bundle are wired together when a connection uses kind: bundle."
+              },
+              "clock_domain": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*$",
+                "description": "Optional clock-domain tag for this port (often matches a clocks[].name). Used for CDC checks; not an HDL port."
+              },
+              "cdc": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "crossing",
+                  "async_handshake",
+                  "unknown"
+                ],
+                "description": "Optional CDC intent: none (same domain), crossing (needs synchronizer), async_handshake, or unknown. Cross-domain links without cdc!=none should be flagged."
+              },
+              "maps_to": {
+                "type": "string",
+                "description": "instance.port this export binds to"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "address_map": {
+      "type": "array",
+      "description": "Local windows for child IPs on an exported bus.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instance",
+          "base_offset",
+          "size_bytes"
+        ],
+        "properties": {
+          "instance": {
+            "type": "string"
+          },
+          "base_offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bus": {
+            "type": "string",
+            "default": "apb"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "source as instance.port"
+        },
+        "to": {
+          "type": "string",
+          "description": "sink as instance.port"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "note": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "port",
+            "bundle"
+          ],
+          "default": "port",
+          "description": "Connection granularity: port = single endpoint; bundle = wire all ports sharing the named bundle id (from/to may use instance.bundle:<id> or note+matching bundles)."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+kind: ip
+name: apb_host_stub
+version: 0.1.0
+description: >
+  Minimal APB3 initiator stub for demo bundle connect (not a real CPU/fabric).
+  Exists so kind:bundle cross-file closure can be exercised initiator→target.
+hdl:
+  module: apb_host_stub
+  files:
+    - rtl/apb_host_stub.v
+clocks:
+  - name: pclk
+    frequency_hz: null
+    description: APB clock
+resets:
+  - name: presetn
+    polarity: active_low
+    async: true
+ports:
+  - name: psel
+    dir: out
+    width: 1
+    protocol: apb3
+    role: psel
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: penable
+    dir: out
+    width: 1
+    protocol: apb3
+    role: penable
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: pwrite
+    dir: out
+    width: 1
+    protocol: apb3
+    role: pwrite
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: paddr
+    dir: out
+    width: 16
+    protocol: apb3
+    role: paddr
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: pwdata
+    dir: out
+    width: 32
+    protocol: apb3
+    role: pwdata
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: prdata
+    dir: in
+    width: 32
+    protocol: apb3
+    role: prdata
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: pready
+    dir: in
+    width: 1
+    protocol: apb3
+    role: pready
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none
+  - name: pslverr
+    dir: in
+    width: 1
+    protocol: apb3
+    role: pslverr
+    bus_role: initiator
+    bundle: apb_m
+    clock_domain: pclk
+    cdc: none

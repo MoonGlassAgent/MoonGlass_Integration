@@ -1,0 +1,74 @@
+kind: ip
+name: picosoc_iomem
+version: 0.1.0
+description: >
+  Logical target representing PicoSoC top-level iomem_* export
+  (mem_addr[31:24] > 0x01 → user MMIO). Not a separate Verilog module —
+  exists so kind:bundle can exercise initiator↔target against picorv32 mem_m.
+  Real RTL is assign/mux in picosoc.v.
+hdl:
+  module: picosoc_iomem
+  files:
+    - https://github.com/YosysHQ/picorv32/blob/ef203c2b0a3fb793280f5114941416c425c5b461/picosoc/picosoc.v
+clocks:
+  - name: clk
+    frequency_hz: null
+resets:
+  - name: resetn
+    polarity: active_low
+    async: true
+ports:
+  - name: iomem_valid
+    dir: in
+    width: 1
+    protocol: picorv32_mem
+    role: valid
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none
+  - name: iomem_ready
+    dir: out
+    width: 1
+    protocol: picorv32_mem
+    role: ready
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none
+  - name: iomem_addr
+    dir: in
+    width: 32
+    protocol: picorv32_mem
+    role: addr
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none
+  - name: iomem_wdata
+    dir: in
+    width: 32
+    protocol: picorv32_mem
+    role: wdata
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none
+  - name: iomem_wstrb
+    dir: in
+    width: 4
+    protocol: picorv32_mem
+    role: wstrb
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none
+  - name: iomem_rdata
+    dir: out
+    width: 32
+    protocol: picorv32_mem
+    role: rdata
+    bus_role: target
+    bundle: mem_s
+    clock_domain: clk
+    cdc: none

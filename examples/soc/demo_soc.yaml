@@ -1,0 +1,121 @@
+kind: soc
+name: demo_soc
+version: 0.1.3
+description: >
+  Tiny demo SoC — APB host stub bundle-connected to a peripheral island,
+  plus UART IRQ crossing from pclk into aon_clk (CDC intent markup only).
+clock_tree:
+  - name: sys_clk
+    frequency_hz: 50000000
+    source: pad
+    description: 50 MHz pad clock (drives pclk on the island / host)
+  - name: aon_clk
+    frequency_hz: 32768
+    source: pad
+    description: Always-on slow clock (IRQ consumer domain for CDC demo)
+reset_tree:
+  - name: sys_rstn
+    polarity: active_low
+    source: pad
+instances:
+  - id: host0
+    ref: apb_host_stub
+    kind: ip
+  - id: periph0
+    ref: periph_apb
+    kind: subsystem
+connections:
+  - from: clock:sys_clk
+    to: host0.pclk
+    width: 1
+    note: Host APB clock (= pclk domain)
+  - from: clock:sys_clk
+    to: periph0.pclk
+    width: 1
+    note: Drive island APB clock
+  - from: reset:sys_rstn
+    to: host0.presetn
+    width: 1
+  - from: reset:sys_rstn
+    to: periph0.presetn
+    width: 1
+  # 9.1 — cross-file bundle closure (host initiator apb_m → island target apb_s)
+  - from: host0.bundle:apb_m
+    to: periph0.bundle:apb_s
+    kind: bundle
+    protocol: apb3
+    note: Bundle connect APB host stub → peripheral island (cross-file resolve)
+  - from: pad:uart_rxd
+    to: periph0.uart_rxd
+    kind: port
+    width: 1
+    protocol: uart
+  - from: periph0.uart_txd
+    to: pad:uart_txd
+    width: 1
+    protocol: uart
+  - from: pad:gpio_in
+    to: periph0.gpio_in
+    width: 8
+    protocol: gpio
+  - from: periph0.gpio_out
+    to: pad:gpio_out
+    width: 8
+    protocol: gpio
+  - from: periph0.gpio_oe
+    to: pad:gpio_oe
+    width: 8
+    protocol: gpio
+  # 9.3 — multi-clock CDC example (intent only; not signoff)
+  - from: periph0.irq_uart
+    to: pad:irq_uart_aon
+    kind: port
+    width: 1
+    protocol: irq
+    note: >
+      CDC intent — UART IRQ leaves pclk (periph0.irq_uart cdc:crossing) and must
+      be 2FF-synced (or equivalent) into aon_clk before use on pad irq_uart_aon.
+      Not signoff-grade; Agent elaborates synchronizer glue when generating RTL.
+# Light fabric demo (0.1.3): single-slave decode window for the island
+fabric:
+  - id: apb_decode
+    kind: decode_mux
+    master: host0.bundle:apb_m
+    select: address
+    addr_role: paddr
+    ready_merge: or
+    rdata_merge: mux_by_select
+    note: Demo markup — one APB window; real decode is inside periph0
+    slaves:
+      - id: island
+        target: periph0
+        match:
+          base: "0x40000000"
+          size_bytes: 65536
+
+address_map:
+  - region: periph0
+    base: "0x40000000"
+    size_bytes: 8192
+    target: periph0
+    description: Window covering uart0 @ +0x0000 and gpio0 @ +0x1000
+pads:
+  - name: uart_txd
+    dir: out
+    width: 1
+  - name: uart_rxd
+    dir: in
+    width: 1
+  - name: gpio_out
+    dir: out
+    width: 8
+  - name: gpio_in
+    dir: in
+    width: 8
+  - name: gpio_oe
+    dir: out
+    width: 8
+  - name: irq_uart_aon
+    dir: out
+    width: 1
+    description: UART IRQ after intended aon_clk synchronizer (CDC demo sink)

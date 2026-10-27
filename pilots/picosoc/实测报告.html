@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MoonGlass_Integration — PicoSoC 实测报告</title>
+<style>
+  :root { --fg:#1a1a1a; --muted:#555; --border:#ddd; --bg:#fafafa; --accent:#0b5fff; --ok:#0a7a2f; }
+  body { font-family: system-ui, "Segoe UI", "Noto Sans SC", sans-serif; line-height:1.55; color:var(--fg);
+         max-width: 52rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+  h1 { font-size: 1.55rem; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.05rem; margin-top: 1.25rem; }
+  .meta { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+  nav.toc { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1.25rem; margin: 1rem 0 1.5rem; }
+  nav.toc ol { margin: 0.4rem 0 0; padding-left: 1.25rem; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  code, pre { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; }
+  pre { background: #f4f4f5; border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; font-size: 0.95rem; }
+  th, td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: var(--bg); }
+  .ok { color: var(--ok); font-weight: 600; }
+  .badge { display:inline-block; background:#e8f0ff; color:#0b5fff; border-radius:4px; padding:0.1rem 0.45rem; font-size:0.8rem; }
+  ul.gaps li { margin-bottom: 0.5rem; }
+  .before { background:#fff5f5; }
+  .after { background:#f0fff4; }
+</style>
+</head>
+<body>
+
+<h1>PicoSoC 实测报告</h1>
+<p class="meta">
+  MoonGlass_Integration <span class="badge">0.1.5-draft</span> ·
+  规则包 pilot（非集成器产品）·
+  报告更新：2026-10-27 22:30 CST (Asia/Shanghai)
+</p>
+
+<nav class="toc" id="toc">
+  <strong>目录</strong>
+  <ol>
+    <li><a href="#s1">结论摘要</a></li>
+    <li><a href="#s2">目标与范围</a></li>
+    <li><a href="#s3">上游来源</a></li>
+    <li><a href="#s4">交付物路径</a></li>
+    <li><a href="#s5">校验命令与结果</a></li>
+    <li><a href="#s6">能力覆盖</a></li>
+    <li><a href="#s7">迭代（0.1.3 → 0.1.5）</a></li>
+    <li><a href="#s8">Before / After</a></li>
+    <li><a href="#s9">仍存缺口</a></li>
+    <li><a href="#s10">声明</a></li>
+  </ol>
+</nav>
+
+<h2 id="s1">1. 结论摘要</h2>
+<p>
+  在 0.1.2 pilot 基础上做了<strong>三轮</strong>规则包迭代，把原先只能写 note 的三类缺口变成了可校验的自有 YAML：
+  <code>fabric</code>（译码/mux）、<code>adapters</code>（异构从设备）、bit-slice（IRQ 打包）。
+  校验器 <span class="ok">examples 5/5 + pilot 6/6 OK</span>。仍<strong>不</strong>生成 glue HDL，也<strong>不</strong>做永久集成器。
+</p>
+
+<h2 id="s2">2. 目标与范围</h2>
+<ul>
+  <li>YAML 重描 PicoSoC 顶层并 validate。</li>
+  <li>迭代关闭实测报告原 §9 三个缺口。</li>
+  <li>不重建 RTL；不产品化集成器。</li>
+</ul>
+
+<h2 id="s3">3. 上游来源</h2>
+<table>
+  <tr><th>项</th><th>值</th></tr>
+  <tr><td>仓库</td><td><a href="https://github.com/YosysHQ/picorv32">YosysHQ/picorv32</a>（ISC）</td></tr>
+  <tr><td>Commit</td><td><code>ef203c2b0a3fb793280f5114941416c425c5b461</code></td></tr>
+  <tr><td>关键文件</td><td><code>picosoc/picosoc.v</code>, <code>picorv32.v</code>, <code>spimemio.v</code>, <code>simpleuart.v</code></td></tr>
+</table>
+
+<h2 id="s4">4. 交付物路径</h2>
+<pre>pilots/picosoc/
+  ip/{picorv32,picosoc_iomem,spimemio,simpleuart,picosoc_mem}.yaml
+  soc/picosoc.yaml          ← fabric + adapters + bit-slice IRQs
+  README.md
+  实测报告.html</pre>
+
+<h2 id="s5">5. 校验命令与结果</h2>
+<pre>cd MoonGlass_Integration
+.venv/bin/python tools/validate.py
+.venv/bin/python tools/validate.py --root pilots/picosoc --no-examples-fallback \
+  pilots/picosoc/ip/*.yaml pilots/picosoc/soc/*.yaml</pre>
+<p class="ok">结果：examples 5/5 OK；pilot 6/6 OK。</p>
+
+<h2 id="s6">6. 能力覆盖</h2>
+<table>
+  <tr><th>能力</th><th>本 pilot</th></tr>
+  <tr><td>9.1 bundle 闭包</td><td><code>cpu.bundle:mem_m</code> → <code>iomem0.bundle:mem_s</code></td></tr>
+  <tr><td>9.2 策略 A</td><td>initiator ↔ target</td></tr>
+  <tr><td>9.3 多时钟 CDC</td><td>无（单时钟）；见 <code>demo_soc</code></td></tr>
+  <tr><td>0.1.3 fabric</td><td><code>mem_decode</code> 六扇区窗口 + ready_merge:or / rdata_merge:mux_by_select</td></tr>
+  <tr><td>0.1.4 adapters</td><td>spimemio / sram / uart_reg 三份映射</td></tr>
+  <tr><td>0.1.5 bit-slice</td><td><code>pad:irq_5|6|7</code> → <code>cpu.irq[5|6|7]</code></td></tr>
+</table>
+
+<h2 id="s7">7. 迭代（0.1.3 → 0.1.5）</h2>
+
+<h3>迭代 1 — 0.1.3-draft：fabric decode/mux</h3>
+<ul>
+  <li>Schema：SoC <code>fabric[]</code>（<code>kind: decode_mux</code>、<code>master</code>、<code>slaves[].match</code>、<code>ready_merge</code>/<code>rdata_merge</code>）。</li>
+  <li>校验：master 端点、target 实例、窗口重叠需 note。</li>
+  <li>Pilot：<code>mem_decode</code> 覆盖 sram / flash_xip / spimem_cfg / uart_div / uart_dat / iomem_user。</li>
+  <li>Demo：<code>examples/soc/demo_soc.yaml</code> 增加轻量 <code>apb_decode</code>。</li>
+</ul>
+
+<h3>迭代 2 — 0.1.4-draft：adapters</h3>
+<ul>
+  <li>Schema：SoC <code>adapters[]</code>（<code>partial_map</code>|<code>width_remap</code>|<code>bridge</code>）+ <code>fabric.slaves[].adapter</code>。</li>
+  <li>校验：<code>to_port</code> 在 target IP 上存在；<code>from_role</code>/宽度与 master bundle 对齐；<code>omit_from_roles</code>。</li>
+  <li>Pilot：<code>mem_to_spimemio</code>（32→24 addr）、<code>mem_to_sram</code>、<code>mem_to_uart_reg</code>。</li>
+</ul>
+
+<h3>迭代 3 — 0.1.5-draft：bit-slice</h3>
+<ul>
+  <li>端点：<code>instance.port[N]</code> / <code>[M:N]</code>；有效位宽参与连线检查。</li>
+  <li>Pilot：三条 IRQ 连线替代原先「只能写 note」。</li>
+</ul>
+
+<h2 id="s8">8. Before / After</h2>
+<table>
+  <tr><th>缺口（0.1.2）</th><th class="before">Before</th><th class="after">After（0.1.5）</th></tr>
+  <tr>
+    <td>内联译码 + ready/rdata mux</td>
+    <td class="before">仅 connection <code>note</code></td>
+    <td class="after"><code>fabric: mem_decode</code> 结构化窗口 + merge 策略</td>
+  </tr>
+  <tr>
+    <td>异构从设备</td>
+    <td class="before">无法对 spimemio/uart/sram 做 bundle 闭包</td>
+    <td class="after"><code>adapters</code> 部分映射 + omit；iomem 仍用同构 bundle</td>
+  </tr>
+  <tr>
+    <td>IRQ bit-slice</td>
+    <td class="before">pads 列出但未连；1 vs 32 会报错</td>
+    <td class="after"><code>pad:irq_N</code> → <code>cpu.irq[N]</code>，width 1 通过</td>
+  </tr>
+</table>
+
+<h2 id="s9">9. 仍存缺口</h2>
+<ol class="gaps">
+  <li>Fabric/adapters <strong>不生成</strong>译码网表 — Agent 仍要写 Verilog mux。</li>
+  <li><code>spimem_cfg</code> 侧带尚未挂 adapter（仅 note）。</li>
+  <li>无 bitfield / VLNV / 厂商互换 / GUI（有意不做）。</li>
+  <li>不做永久集成器产品。</li>
+</ol>
+
+<h2 id="s10">10. 声明</h2>
+<blockquote>
+  本 pilot 测试的是 MoonGlass_Integration <strong>规则 / Schema / 校验包</strong>，
+  不是完整的重新集成工具，也不替代 PicoSoC 原有 Verilog 顶层。
+</blockquote>
+
+<p class="meta" style="margin-top:2.5rem;">— End of report —</p>
+</body>
+</html>

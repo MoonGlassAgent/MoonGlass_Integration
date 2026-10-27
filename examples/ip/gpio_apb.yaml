@@ -1,0 +1,127 @@
+kind: ip
+name: gpio_apb
+version: 0.1.0
+description: Minimal APB3 GPIO bank. Demo contract only.
+hdl:
+  module: gpio_apb
+  files:
+    - rtl/gpio_apb.v
+parameters:
+  WIDTH:
+    type: int
+    default: 8
+    description: Number of GPIO pins
+clocks:
+  - name: pclk
+    frequency_hz: null
+resets:
+  - name: presetn
+    polarity: active_low
+    async: true
+ports:
+  - name: psel
+    dir: in
+    width: 1
+    protocol: apb3
+    role: psel
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: penable
+    dir: in
+    width: 1
+    protocol: apb3
+    role: penable
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pwrite
+    dir: in
+    width: 1
+    protocol: apb3
+    role: pwrite
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: paddr
+    dir: in
+    width: 8
+    protocol: apb3
+    role: paddr
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pwdata
+    dir: in
+    width: 32
+    protocol: apb3
+    role: pwdata
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: prdata
+    dir: out
+    width: 32
+    protocol: apb3
+    role: prdata
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pready
+    dir: out
+    width: 1
+    protocol: apb3
+    role: pready
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pslverr
+    dir: out
+    width: 1
+    protocol: apb3
+    role: pslverr
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: gpio_out
+    dir: out
+    width: 8
+    protocol: gpio
+  - name: gpio_in
+    dir: in
+    width: 8
+    protocol: gpio
+  - name: gpio_oe
+    dir: out
+    width: 8
+    protocol: gpio
+  - name: irq
+    dir: out
+    width: 1
+    protocol: irq
+memory_maps:
+  - name: regs
+    bus: apb3
+    base_offset: 0
+    size_bytes: 256
+    registers:
+      - name: OUT
+        offset: 0x00
+        width: 32
+        access: rw
+      - name: IN
+        offset: 0x04
+        width: 32
+        access: ro
+      - name: OE
+        offset: 0x08
+        width: 32
+        access: rw

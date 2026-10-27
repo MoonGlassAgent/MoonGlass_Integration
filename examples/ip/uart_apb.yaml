@@ -1,0 +1,130 @@
+kind: ip
+name: uart_apb
+version: 0.1.0
+description: Minimal APB3 UART (TX/RX + IRQ). Demo contract only.
+hdl:
+  module: uart_apb
+  files:
+    - rtl/uart_apb.v
+parameters:
+  FIFO_DEPTH:
+    type: int
+    default: 16
+    description: RX/TX FIFO depth
+clocks:
+  - name: pclk
+    frequency_hz: null
+    description: APB clock
+resets:
+  - name: presetn
+    polarity: active_low
+    async: true
+ports:
+  - name: psel
+    dir: in
+    width: 1
+    protocol: apb3
+    role: psel
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: penable
+    dir: in
+    width: 1
+    protocol: apb3
+    role: penable
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pwrite
+    dir: in
+    width: 1
+    protocol: apb3
+    role: pwrite
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: paddr
+    dir: in
+    width: 12
+    protocol: apb3
+    role: paddr
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pwdata
+    dir: in
+    width: 32
+    protocol: apb3
+    role: pwdata
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: prdata
+    dir: out
+    width: 32
+    protocol: apb3
+    role: prdata
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pready
+    dir: out
+    width: 1
+    protocol: apb3
+    role: pready
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: pslverr
+    dir: out
+    width: 1
+    protocol: apb3
+    role: pslverr
+    bus_role: target
+    bundle: apb_s
+    clock_domain: pclk
+    cdc: none
+  - name: uart_txd
+    dir: out
+    width: 1
+    protocol: uart
+    role: txd
+  - name: uart_rxd
+    dir: in
+    width: 1
+    protocol: uart
+    role: rxd
+  - name: irq
+    dir: out
+    width: 1
+    protocol: irq
+    clock_domain: pclk
+    cdc: crossing
+    description: IRQ leaves pclk; SoC must sync into consumer domain (see demo_soc aon_clk)
+memory_maps:
+  - name: regs
+    bus: apb3
+    base_offset: 0
+    size_bytes: 4096
+    registers:
+      - name: DATA
+        offset: 0x00
+        width: 32
+        access: rw
+        description: TX write / RX read
+      - name: STATUS
+        offset: 0x04
+        width: 32
+        access: ro
+      - name: CTRL
+        offset: 0x08
+        width: 32
+        access: rw

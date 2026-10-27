@@ -1,0 +1,390 @@
+kind: soc
+name: picosoc
+version: 0.1.3
+description: >
+  Pilot re-description of YosysHQ PicoSoC top (picosoc.v). YAML contract +
+  validate only — does not regenerate Verilog. Uses fabric decode_mux,
+  heterogeneous adapters, and bit-slice IRQ endpoints (pack 0.1.3–0.1.5).
+  Single clock domain; CDC multi-clock example lives in pack examples/demo_soc.
+clock_tree:
+  - name: clk
+    frequency_hz: null
+    source: pad
+    description: Sole PicoSoC clock (board-dependent; often ~12–48 MHz on iCE40 demos)
+reset_tree:
+  - name: resetn
+    polarity: active_low
+    source: pad
+instances:
+  - id: cpu
+    ref: picorv32
+    kind: ip
+    parameters:
+      BARREL_SHIFTER: 1
+      ENABLE_MUL: 1
+      ENABLE_DIV: 1
+      ENABLE_COMPRESSED: 1
+      ENABLE_IRQ_QREGS: 0
+      PROGADDR_RESET: 1048576
+      STACKADDR: 1024
+  - id: spimemio0
+    ref: spimemio
+    kind: ip
+  - id: uart0
+    ref: simpleuart
+    kind: ip
+  - id: memory
+    ref: picosoc_mem
+    kind: ip
+    parameters:
+      WORDS: 256
+  - id: iomem0
+    ref: picosoc_iomem
+    kind: ip
+connections:
+  # Clocks / resets
+  - from: clock:clk
+    to: cpu.clk
+    width: 1
+  - from: clock:clk
+    to: spimemio0.clk
+    width: 1
+  - from: clock:clk
+    to: uart0.clk
+    width: 1
+  - from: clock:clk
+    to: memory.clk
+    width: 1
+  - from: clock:clk
+    to: iomem0.clk
+    width: 1
+  - from: reset:resetn
+    to: cpu.resetn
+    width: 1
+  - from: reset:resetn
+    to: spimemio0.resetn
+    width: 1
+  - from: reset:resetn
+    to: uart0.resetn
+    width: 1
+  - from: reset:resetn
+    to: iomem0.resetn
+    width: 1
+
+  # 9.1 + 9.2 strategy A — full picorv32_mem bundle CPU → exported iomem target
+  - from: cpu.bundle:mem_m
+    to: iomem0.bundle:mem_s
+    kind: bundle
+    protocol: picorv32_mem
+    note: >
+      Homogeneous export of user MMIO (iomem_*). Full mem_* fanout to RAM /
+      SPI / UART is declared under fabric: mem_decode (+ adapters), not as
+      extra kind:bundle links.
+
+  # UART pads
+  - from: uart0.ser_tx
+    to: pad:ser_tx
+    kind: port
+    width: 1
+    protocol: uart
+  - from: pad:ser_rx
+    to: uart0.ser_rx
+    kind: port
+    width: 1
+    protocol: uart
+
+  # SPI flash pads
+  - from: spimemio0.flash_csb
+    to: pad:flash_csb
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_clk
+    to: pad:flash_clk
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io0_oe
+    to: pad:flash_io0_oe
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io1_oe
+    to: pad:flash_io1_oe
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io2_oe
+    to: pad:flash_io2_oe
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io3_oe
+    to: pad:flash_io3_oe
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io0_do
+    to: pad:flash_io0_do
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io1_do
+    to: pad:flash_io1_do
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io2_do
+    to: pad:flash_io2_do
+    width: 1
+    protocol: spiflash
+  - from: spimemio0.flash_io3_do
+    to: pad:flash_io3_do
+    width: 1
+    protocol: spiflash
+  - from: pad:flash_io0_di
+    to: spimemio0.flash_io0_di
+    width: 1
+    protocol: spiflash
+  - from: pad:flash_io1_di
+    to: spimemio0.flash_io1_di
+    width: 1
+    protocol: spiflash
+  - from: pad:flash_io2_di
+    to: spimemio0.flash_io2_di
+    width: 1
+    protocol: spiflash
+  - from: pad:flash_io3_di
+    to: spimemio0.flash_io3_di
+    width: 1
+    protocol: spiflash
+
+  # Bit-slice IRQ packing (0.1.5): pad irq_N → cpu.irq[N]
+  - from: pad:irq_5
+    to: cpu.irq[5]
+    kind: port
+    width: 1
+    protocol: irq
+    note: PicoSoC packs external irq_5 into cpu.irq[5]
+  - from: pad:irq_6
+    to: cpu.irq[6]
+    kind: port
+    width: 1
+    protocol: irq
+  - from: pad:irq_7
+    to: cpu.irq[7]
+    kind: port
+    width: 1
+    protocol: irq
+
+# Heterogeneous protocol maps (0.1.4) — referenced by fabric slaves
+adapters:
+  - id: mem_to_spimemio
+    kind: width_remap
+    from_protocol: picorv32_mem
+    to_protocol: spimemio_xip
+    maps:
+      - from_role: addr
+        to_port: addr
+        width_from: 32
+        width_to: 24
+        note: SoC passes mem_addr[23:0]
+      - from_role: valid
+        to_port: valid
+        width_from: 1
+        width_to: 1
+      - from_role: ready
+        to_port: ready
+        width_from: 1
+        width_to: 1
+      - from_role: rdata
+        to_port: rdata
+        width_from: 32
+        width_to: 32
+    omit_from_roles: [wdata, wstrb]
+    note: XIP read path only; writes absent on spimemio
+  - id: mem_to_sram
+    kind: partial_map
+    from_protocol: picorv32_mem
+    to_protocol: picosoc_sram
+    maps:
+      - from_role: addr
+        to_port: addr
+        width_from: 32
+        width_to: 22
+        note: Word address mem_addr[23:2]
+      - from_role: wdata
+        to_port: wdata
+        width_from: 32
+        width_to: 32
+      - from_role: wstrb
+        to_port: wen
+        width_from: 4
+        width_to: 4
+        note: wstrb → wen when write; Agent glue for read path / ram_ready
+      - from_role: rdata
+        to_port: rdata
+        width_from: 32
+        width_to: 32
+    omit_from_roles: [valid, ready]
+    note: SRAM has no valid/ready; SoC creates ram_ready one cycle later
+  - id: mem_to_uart_reg
+    kind: bridge
+    from_protocol: picorv32_mem
+    to_protocol: picosoc_uart_reg
+    maps:
+      - from_role: wdata
+        to_port: reg_dat_di
+        width_from: 32
+        width_to: 32
+      - from_role: rdata
+        to_port: reg_dat_do
+        width_from: 32
+        width_to: 32
+      - from_role: valid
+        to_port: reg_dat_we
+        width_from: 1
+        width_to: 1
+        note: Agent also drives reg_dat_re / reg_div_* from decode + pwrite
+    omit_from_roles: [addr, wstrb, ready]
+    note: >
+      UART is register-select, not a mem slave. Decode exact addresses
+      0x02000004 / 0x02000008 into reg_*_we/re — Agent elaborates glue.
+
+# Inline address decode + ready/rdata mux (0.1.3) — validation markup, not HDL
+fabric:
+  - id: mem_decode
+    kind: decode_mux
+    master: cpu.bundle:mem_m
+    select: address
+    addr_role: addr
+    ready_merge: or
+    rdata_merge: mux_by_select
+    note: >
+      Mirrors picosoc.v inline decode of mem_* into RAM / spimemio / uart / iomem
+      with combinatorial ready OR and rdata mux. Does not generate HDL.
+    slaves:
+      - id: sram
+        target: memory
+        match:
+          base: "0x00000000"
+          size_bytes: 16777216
+        adapter: mem_to_sram
+        note: Doc window; physical size WORDS*4; beyond aliases to flash
+      - id: flash_xip
+        target: spimemio0
+        match:
+          base: "0x01000000"
+          size_bytes: 16777216
+        adapter: mem_to_spimemio
+      - id: spimem_cfg
+        target: spimemio0
+        match:
+          base: "0x02000000"
+          size_bytes: 4
+        note: cfgreg sideband — Agent maps mem write strobes to cfgreg_we
+      - id: uart_div
+        target: uart0
+        match:
+          base: "0x02000004"
+          size_bytes: 4
+        adapter: mem_to_uart_reg
+      - id: uart_dat
+        target: uart0
+        match:
+          base: "0x02000008"
+          size_bytes: 4
+        adapter: mem_to_uart_reg
+      - id: iomem_user
+        target: iomem0
+        match:
+          base: "0x03000000"
+          size_bytes: 33285996544
+        note: Homogeneous mem_s also connected via kind:bundle above
+
+address_map:
+  - region: sram
+    base: "0x00000000"
+    size_bytes: 16777216
+    target: memory
+    description: >
+      Doc window 0x00000000..0x00FFFFFF — physical SRAM is only WORDS*4 bytes;
+      reads beyond physical size alias into SPI flash (see picosoc README).
+  - region: spiflash_xip
+    base: "0x01000000"
+    size_bytes: 16777216
+    target: spimemio0
+    description: External serial flash XIP (spimemio valid gated in picosoc.v)
+  - region: spimemio_cfg
+    base: "0x02000000"
+    size_bytes: 4
+    target: spimemio0
+    description: SPI Flash Controller Config Register
+  - region: uart_div
+    base: "0x02000004"
+    size_bytes: 4
+    target: uart0
+    description: UART clock divider
+  - region: uart_dat
+    base: "0x02000008"
+    size_bytes: 4
+    target: uart0
+    description: UART send/recv data
+  - region: iomem_user
+    base: "0x03000000"
+    size_bytes: 33285996544
+    target: iomem0
+    description: >
+      Memory-mapped user peripherals via iomem_* (doc 0x03000000..0xFFFFFFFF).
+      size_bytes = 0x100000000 - 0x03000000.
+
+pads:
+  - name: ser_tx
+    dir: out
+    width: 1
+  - name: ser_rx
+    dir: in
+    width: 1
+  - name: flash_csb
+    dir: out
+    width: 1
+  - name: flash_clk
+    dir: out
+    width: 1
+  - name: flash_io0_oe
+    dir: out
+    width: 1
+  - name: flash_io1_oe
+    dir: out
+    width: 1
+  - name: flash_io2_oe
+    dir: out
+    width: 1
+  - name: flash_io3_oe
+    dir: out
+    width: 1
+  - name: flash_io0_do
+    dir: out
+    width: 1
+  - name: flash_io1_do
+    dir: out
+    width: 1
+  - name: flash_io2_do
+    dir: out
+    width: 1
+  - name: flash_io3_do
+    dir: out
+    width: 1
+  - name: flash_io0_di
+    dir: in
+    width: 1
+  - name: flash_io1_di
+    dir: in
+    width: 1
+  - name: flash_io2_di
+    dir: in
+    width: 1
+  - name: flash_io3_di
+    dir: in
+    width: 1
+  - name: irq_5
+    dir: in
+    width: 1
+  - name: irq_6
+    dir: in
+    width: 1
+  - name: irq_7
+    dir: in
+    width: 1

@@ -1,0 +1,428 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moonglass.local/schemas/soc_top.schema.json",
+  "title": "MoonGlass_Integration SoC top",
+  "description": "Top-level structure: instances (IP or subsystem), connections, clock/reset trees, address map hooks.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "name",
+    "version",
+    "instances",
+    "connections"
+  ],
+  "properties": {
+    "kind": {
+      "const": "soc"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-z0-9.]+)?$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "clock_tree": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "frequency_hz": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "source": {
+            "type": "string",
+            "description": "pad, pll, or another clock name"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "reset_tree": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "polarity"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "polarity": {
+            "enum": [
+              "active_low",
+              "active_high"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "instances": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "ref"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "ref": {
+            "type": "string",
+            "description": "IP or subsystem name / relative YAML path stem."
+          },
+          "kind": {
+            "enum": [
+              "ip",
+              "subsystem",
+              "auto"
+            ],
+            "default": "auto"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "connections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "endpoint: instance.port | instance.port[N] | instance.port[M:N] | instance.bundle:<id> | clock:<name> | reset:<name> | pad:<name> | const:<value>"
+          },
+          "to": {
+            "type": "string",
+            "description": "endpoint: instance.port | instance.port[N] | instance.port[M:N] | instance.bundle:<id> | pad:<name>"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "port",
+              "bundle"
+            ],
+            "default": "port",
+            "description": "Connection granularity: port (default) = one signal; bundle = connect a whole bundle group declared via port.bundle on the IP/subsystem contracts."
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "address_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "region",
+          "base",
+          "size_bytes"
+        ],
+        "properties": {
+          "region": {
+            "type": "string"
+          },
+          "base": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "string",
+                "pattern": "^0x[0-9a-fA-F]+$"
+              }
+            ]
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "target": {
+            "type": "string",
+            "description": "instance or instance.bus this window hits"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "dir"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dir": {
+            "enum": [
+              "in",
+              "out",
+              "inout"
+            ]
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fabric": {
+      "type": "array",
+      "description": "SoC-level decode/mux fabric fragments (documentation + validation). Not an elaborator; does not generate glue HDL.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "master",
+          "slaves"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "kind": {
+            "enum": [
+              "decode_mux"
+            ],
+            "description": "Address decode + ready/rdata merge intent"
+          },
+          "master": {
+            "type": "string",
+            "description": "Master endpoint: instance.port or instance.bundle:<id>"
+          },
+          "select": {
+            "enum": [
+              "address"
+            ],
+            "default": "address"
+          },
+          "addr_role": {
+            "type": "string",
+            "description": "Port role on master carrying the address used for match (e.g. addr, paddr)"
+          },
+          "ready_merge": {
+            "enum": [
+              "or",
+              "priority",
+              "onehot",
+              "unknown"
+            ],
+            "default": "or"
+          },
+          "rdata_merge": {
+            "enum": [
+              "mux_by_select",
+              "priority",
+              "unknown"
+            ],
+            "default": "mux_by_select"
+          },
+          "slaves": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "target",
+                "match"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Instance id this decode window selects"
+                },
+                "match": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "base",
+                    "size_bytes"
+                  ],
+                  "properties": {
+                    "base": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^0x[0-9a-fA-F]+$"
+                        }
+                      ]
+                    },
+                    "size_bytes": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                },
+                "adapter": {
+                  "type": "string",
+                  "description": "Optional adapters[].id for heterogeneous / partial map (0.1.4+)"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "adapters": {
+      "type": "array",
+      "description": "Heterogeneous / partial protocol maps (validation only). Referenced from fabric[].slaves[].adapter. Not IP-XACT bridges.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "from_protocol",
+          "to_protocol",
+          "maps"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "kind": {
+            "enum": [
+              "partial_map",
+              "width_remap",
+              "bridge"
+            ],
+            "description": "partial_map = subset of roles; width_remap = width change on mapped members; bridge = free-form Agent glue with maps as hints"
+          },
+          "from_protocol": {
+            "type": "string"
+          },
+          "to_protocol": {
+            "type": "string"
+          },
+          "maps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "from_role",
+                "to_port"
+              ],
+              "properties": {
+                "from_role": {
+                  "type": "string",
+                  "description": "role on master/from protocol"
+                },
+                "to_port": {
+                  "type": "string",
+                  "description": "port name on target IP"
+                },
+                "width_from": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "width_to": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "omit_from_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Master roles intentionally not present on slave"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+kind: ip
+name: picorv32
+version: 0.1.0
+description: >
+  PicoRV32 CPU native memory interface as used by PicoSoC (look-ahead / PCPI
+  omitted). Contract only — cite upstream picorv32.v; do not copy RTL here.
+hdl:
+  module: picorv32
+  files:
+    - https://github.com/YosysHQ/picorv32/blob/ef203c2b0a3fb793280f5114941416c425c5b461/picorv32.v
+parameters:
+  ENABLE_COUNTERS:
+    type: int
+    default: 1
+  BARREL_SHIFTER:
+    type: int
+    default: 1
+  ENABLE_MUL:
+    type: int
+    default: 1
+  ENABLE_DIV:
+    type: int
+    default: 1
+  ENABLE_FAST_MUL:
+    type: int
+    default: 0
+  ENABLE_COMPRESSED:
+    type: int
+    default: 1
+  ENABLE_IRQ_QREGS:
+    type: int
+    default: 0
+  MEM_WORDS:
+    type: int
+    default: 256
+    description: PicoSoC STACKADDR = 4*MEM_WORDS (not a picorv32.v param; SoC-side)
+  STACKADDR:
+    type: int
+    default: 1024
+  PROGADDR_RESET:
+    type: int
+    default: 1048576
+    description: 0x00100000 — 1 MB into flash
+  PROGADDR_IRQ:
+    type: int
+    default: 0
+clocks:
+  - name: clk
+    frequency_hz: null
+    description: Single system clock (PicoSoC is single-domain)
+resets:
+  - name: resetn
+    polarity: active_low
+    async: true
+ports:
+  # --- picorv32_mem initiator bundle (custom protocol) ---
+  - name: mem_valid
+    dir: out
+    width: 1
+    protocol: picorv32_mem
+    role: valid
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  - name: mem_ready
+    dir: in
+    width: 1
+    protocol: picorv32_mem
+    role: ready
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  - name: mem_addr
+    dir: out
+    width: 32
+    protocol: picorv32_mem
+    role: addr
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  - name: mem_wdata
+    dir: out
+    width: 32
+    protocol: picorv32_mem
+    role: wdata
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  - name: mem_wstrb
+    dir: out
+    width: 4
+    protocol: picorv32_mem
+    role: wstrb
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  - name: mem_rdata
+    dir: in
+    width: 32
+    protocol: picorv32_mem
+    role: rdata
+    bus_role: initiator
+    bundle: mem_m
+    clock_domain: clk
+    cdc: none
+  # Outside bundle — CPU-only sideband (slaves do not consume)
+  - name: mem_instr
+    dir: out
+    width: 1
+    protocol: picorv32_mem
+    role: instr
+    bus_role: initiator
+    clock_domain: clk
+    cdc: none
+    description: Instruction vs data; not part of mem_m↔mem_s closure
+  - name: irq
+    dir: in
+    width: 32
+    protocol: irq
+    role: irq_vector
+    clock_domain: clk
+    cdc: none
+    description: Packed IRQ vector; PicoSoC ORs pad irq_5/6/7 into bits [7:5]
+  - name: trap
+    dir: out
+    width: 1
+    protocol: raw
+    clock_domain: clk
+    cdc: none
+    description: Optional; unused by picosoc.v top wiring

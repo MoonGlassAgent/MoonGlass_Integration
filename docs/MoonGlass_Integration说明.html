@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoonGlass_Integration 说明 — 0.1.6-draft</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1a1d23;
+    --muted: #5c6570;
+    --line: #e2e6eb;
+    --accent: #0b6e4f;
+    --accent-soft: #e6f4ef;
+    --warn: #8a5a00;
+    --warn-bg: #fff6e5;
+    --gap-bg: #f3f0ff;
+    --gap-ink: #3d2f7a;
+    --code-bg: #f0f2f5;
+    --toc-w: 240px;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(26,29,35,.06), 0 8px 24px rgba(26,29,35,.04);
+    font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+                 "Noto Sans CJK SC", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.65;
+    font-size: 15.5px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Noto Sans Mono", monospace;
+    font-size: 0.9em;
+  }
+  code {
+    background: var(--code-bg);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  pre {
+    background: #1a1d23;
+    color: #e8ecf0;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: var(--toc-w) minmax(0, 1fr);
+    gap: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+  nav.toc {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1.4rem 1rem 2rem 1.2rem;
+    background: #eef1f4;
+    border-right: 1px solid var(--line);
+  }
+  nav.toc .brand {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+  nav.toc .ver {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  nav.toc h2 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+    margin: 0 0 0.55rem;
+    font-weight: 600;
+  }
+  nav.toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: toc;
+  }
+  nav.toc li { margin: 0 0 0.15rem; }
+  nav.toc a {
+    display: block;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 0.84rem;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  nav.toc a:hover { background: #e0e5ea; text-decoration: none; }
+  nav.toc a::before {
+    counter-increment: toc;
+    content: counter(toc) ". ";
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  main {
+    padding: 1.75rem 2.2rem 3.5rem;
+  }
+  header.hero {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.7rem 1.35rem;
+    margin-bottom: 1.5rem;
+  }
+  header.hero h1 {
+    margin: 0 0 0.35rem;
+    font-size: 1.65rem;
+    letter-spacing: -0.02em;
+  }
+  header.hero .meta {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 0.9rem;
+  }
+  header.hero .lead {
+    margin: 0;
+    font-size: 1.02rem;
+    max-width: 52rem;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+
+  section.block {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.35rem 1.55rem 1.5rem;
+    margin-bottom: 1.15rem;
+    scroll-margin-top: 1rem;
+  }
+  section.block h2 {
+    margin: 0 0 0.85rem;
+    font-size: 1.22rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  section.block h3 {
+    margin: 1.15rem 0 0.5rem;
+    font-size: 1.02rem;
+  }
+  section.block p { margin: 0.55rem 0; }
+  section.block ul, section.block ol { margin: 0.4rem 0 0.6rem; padding-left: 1.35rem; }
+  section.block li { margin: 0.25rem 0; }
+
+  .callout {
+    border-radius: 8px;
+    padding: 0.75rem 0.95rem;
+    margin: 0.85rem 0;
+    font-size: 0.94rem;
+  }
+  .callout.warn { background: var(--warn-bg); border-left: 4px solid #e0a100; color: #4a3a10; }
+  .callout.gap { background: var(--gap-bg); border-left: 4px solid #6b5bb8; color: var(--gap-ink); }
+  .callout.ok { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .callout strong { display: block; margin-bottom: 0.2rem; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 0.7rem 0 0.4rem;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 0.5rem 0.65rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #f0f3f6;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  tr:nth-child(even) td { background: #fafbfc; }
+  .table-wrap { overflow-x: auto; }
+
+  /* Architecture flow */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 1rem 0;
+  }
+  .flow .node {
+    background: var(--accent-soft);
+    border: 1px solid #b7d9cb;
+    color: var(--accent);
+    font-weight: 600;
+    padding: 0.55rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+  .flow .arrow { color: var(--muted); font-size: 1.1rem; }
+  .flow .node.rtl { background: #eef0ff; border-color: #c5cae8; color: #3949ab; }
+  .flow .node.val { background: #fff6e5; border-color: #e8c97a; color: var(--warn); }
+
+  .layers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 860px) {
+    .layers { grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; }
+    nav.toc {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+    }
+    main { padding: 1.2rem 1rem 2.5rem; }
+  }
+  .layer-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.85rem 0.95rem;
+    background: #fafbfc;
+  }
+  .layer-card .tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .layer-card h4 { margin: 0.25rem 0 0.4rem; font-size: 0.98rem; }
+  .layer-card p { margin: 0; font-size: 0.86rem; color: var(--muted); }
+
+  .filetree {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+  }
+  .filetree a { color: var(--accent); }
+
+  .gap-item {
+    border: 1px solid #ddd6f3;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    margin: 0.75rem 0;
+    background: #faf9ff;
+  }
+  .gap-item h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    color: var(--gap-ink);
+  }
+  .gap-item .why {
+    margin: 0.35rem 0 0;
+    font-size: 0.92rem;
+  }
+  .gap-item .why dt {
+    font-weight: 600;
+    margin-top: 0.45rem;
+    color: #2a2155;
+  }
+  .gap-item .why dd {
+    margin: 0.15rem 0 0 0;
+    color: var(--muted);
+  }
+
+  footer.page-foot {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 0.5rem;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="目录">
+  <div class="brand">MoonGlass_Integration</div>
+  <div class="ver">说明文档 · 0.1.6-draft</div>
+  <h2>目录</h2>
+  <ol>
+    <li><a href="#定位与边界">定位与边界</a></li>
+    <li><a href="#整体架构">整体架构</a></li>
+    <li><a href="#目录与入口文件">目录与入口文件</a></li>
+    <li><a href="#自研契约字段说明">自研契约字段说明</a></li>
+    <li><a href="#规则与场景">规则与场景</a></li>
+    <li><a href="#连连看">连连看（NL↔必填字段）</a></li>
+    <li><a href="#如何使用">如何在 Harness 使用</a></li>
+    <li><a href="#校验与完成定义">校验与「完成」定义</a></li>
+    <li><a href="#从业界吸收了什么">从业界吸收了什么</a></li>
+    <li><a href="#仍缺及原因">缺口状态（9.1–9.3d 已做 / 9.4–9.5 有意未做）</a></li>
+    <li><a href="#版本与相关路径">版本与相关路径</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero" id="这是什么">
+  <span class="badge">规则包</span>
+  <span class="badge">Agent + YAML</span>
+  <span class="badge">非集成器</span>
+  <h1>MoonGlass_Integration 说明</h1>
+  <p class="meta">面向芯片工程师的可读说明 · 中文 · 自包含单页</p>
+  <p class="lead"><strong>这是什么：</strong>一套让任意 coding agent（Workbuddy / Claude Code / DeepSeek harness / Cursor 等）靠 YAML 契约做 SoC 组装与连线的<strong>规则 / Schema / 约束包</strong>。自然语言是意图，YAML 是真源；校验器只做规则执行。它<strong>不是</strong>集成引擎，也<strong>不是</strong> MoonGlass 产品内的接线功能——协议与结构清楚之后，Agent 可现场写 glue；本包刻意不做永久集成工具产品。</p>
+</header>
+
+<!-- 1 -->
+<section class="block" id="定位与边界">
+  <h2>1. 定位与边界</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>是</th><th>不是</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>IP / Subsystem / SoC 的 JSON Schema + 命名与连线约定</td>
+        <td>FuseSoC / IP-XACT / Vivado IPI 的替代品（刻意不做）</td>
+      </tr>
+      <tr>
+        <td>Agent 可读的 <code>AGENTS.md</code> / <code>CLAUDE.md</code> / <code>.cursorrules</code></td>
+        <td>MoonGlass 里跑集成的功能模块</td>
+      </tr>
+      <tr>
+        <td>示例 YAML + 薄校验脚本 <code>tools/validate.py</code></td>
+        <td>永久的「集成工具产品」或重型 elaborator</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>与 MoonGlass 的关系</h3>
+  <p>MoonGlass 适合<strong>托住</strong>这类规则、描述与状态（托管 / 检查契约）。本包<strong>不</strong>在 MoonGlass 内执行 SoC 接线。社区可先挂这套组建拉讨论与流量，与核心产品解耦。任意 coding agent 都可按本规则包执行集成。</p>
+  <div class="callout warn">
+    <strong>边界一句话</strong>
+    本仓库交付的是「契约 + 规则 + 薄校验」；RTL 展开与 glue 由 Agent 按 YAML 现场完成，不在本包产品化。
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="block" id="整体架构">
+  <h2>2. 整体架构</h2>
+  <p>契约分三层 YAML，由下到上组装；每一层有对应 JSON Schema。</p>
+  <div class="layers">
+    <div class="layer-card">
+      <div class="tag">Layer 1</div>
+      <h4>IP 接口</h4>
+      <p><code>kind: ip</code> — 时钟 / 复位 / 端口 / 参数 / 可选 memory_map。<br>
+      Schema: <a href="../schemas/ip_interface.schema.json"><code>ip_interface.schema.json</code></a></p>
+    </div>
+    <div class="layer-card">
+      <div class="tag">Layer 2</div>
+      <h4>Subsystem</h4>
+      <p><code>kind: subsystem</code> — 实例化 IP、内部 links、exports、相对 address_map。<br>
+      Schema: <a href="../schemas/subsystem.schema.json"><code>subsystem.schema.json</code></a></p>
+    </div>
+    <div class="layer-card">
+      <div class="tag">Layer 3</div>
+      <h4>SoC Top</h4>
+      <p><code>kind: soc</code> — 实例、connections、clock/reset tree、绝对 address_map、pads。<br>
+      Schema: <a href="../schemas/soc_top.schema.json"><code>soc_top.schema.json</code></a></p>
+    </div>
+  </div>
+
+  <h3>Agent 工作流</h3>
+  <div class="flow" aria-label="工作流图">
+    <div class="node">自然语言意图</div>
+    <div class="arrow">→</div>
+    <div class="node">最小 YAML 编辑<br><span style="font-weight:400;font-size:0.8em">ip | subsys | soc</span></div>
+    <div class="arrow">→</div>
+    <div class="node val">validate.py<br><span style="font-weight:400;font-size:0.8em">schema + 一致性</span></div>
+    <div class="arrow">→</div>
+    <div class="node rtl">Elaborate RTL / glue<br><span style="font-weight:400;font-size:0.8em">仅满足契约</span></div>
+    <div class="arrow">→</div>
+    <div class="node">证据清单<br><span style="font-weight:400;font-size:0.8em">文件 + 校验输出</span></div>
+  </div>
+  <pre><code>NL request → identify targets (ip | subsystem | soc)
+          → edit the smallest YAML set that expresses the intent
+          → validate (schema + connection sanity)
+          → generate/update RTL wrappers / top / decode as needed
+          → list evidence (files changed + validator output)</code></pre>
+  <p>示例 demo：<a href="../examples/soc/demo_soc.yaml"><code>examples/soc/demo_soc.yaml</code></a>（APB 外设岛 stub）。</p>
+</section>
+
+<!-- 3 -->
+<section class="block" id="目录与入口文件">
+  <h2>3. 目录与入口文件</h2>
+  <div class="filetree">
+MoonGlass_Integration/<br>
+├── <a href="../AGENTS.md">AGENTS.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Agent 规范 brief（canonical）<br>
+├── <a href="../CLAUDE.md">CLAUDE.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Claude Code 入口 → 转 AGENTS.md<br>
+├── <a href="../WORKBUDDY.md">WORKBUDDY.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Workbuddy / Cursor 类提示<br>
+├── <a href="../.cursorrules">.cursorrules</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Cursor / Workbuddy 规则钩子<br>
+├── <a href="../README.md">README.md</a> · <a href="../VERSION">VERSION</a> · <a href="../CHANGELOG.md">CHANGELOG.md</a><br>
+├── schemas/<br>
+│&nbsp;&nbsp; ├── <a href="../schemas/ip_interface.schema.json">ip_interface.schema.json</a><br>
+│&nbsp;&nbsp; ├── <a href="../schemas/subsystem.schema.json">subsystem.schema.json</a><br>
+│&nbsp;&nbsp; └── <a href="../schemas/soc_top.schema.json">soc_top.schema.json</a><br>
+├── examples/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 最小 APB 外设岛 demo<br>
+│&nbsp;&nbsp; ├── ip/ · subsys/ · soc/<br>
+├── rules/<br>
+│&nbsp;&nbsp; ├── <a href="../rules/integration_rules.md">integration_rules.md</a> &nbsp;# 命名、连线、CDC、完成定义<br>
+│&nbsp;&nbsp; ├── <a href="../rules/scenarios.md">scenarios.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# NL→YAML 场景 S1–S11<br>
+│&nbsp;&nbsp; └── <a href="../rules/nl_field_map.md">nl_field_map.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 连连看 NL↔Must 字段<br>
+├── prompts/<br>
+│&nbsp;&nbsp; └── <a href="../prompts/integrate.md">integrate.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 可复制起手提示<br>
+├── tools/<br>
+│&nbsp;&nbsp; └── <a href="../tools/validate.py">validate.py</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 规则执行，非集成器<br>
+└── references/<br>
+&nbsp;&nbsp;&nbsp; ├── <a href="../references/ABSORBED.md">ABSORBED.md</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 业界意图 → 自研字段<br>
+&nbsp;&nbsp;&nbsp; ├── <a href="../references/vendor_text_constraints.md">vendor_text_constraints.md</a><br>
+&nbsp;&nbsp;&nbsp; └── vendors/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 按厂商短摘要（仅对照）
+  </div>
+  <p>芯片仓库建议布局：<code>ip/&lt;name&gt;.yaml</code>、<code>subsys/&lt;name&gt;.yaml</code>、<code>soc/&lt;name&gt;.yaml</code>。</p>
+</section>
+
+<!-- 4 -->
+<section class="block" id="自研契约字段说明">
+  <h2>4. 自研契约字段说明</h2>
+  <p>以下均为<strong>自研</strong>字段名与语义，不是某厂商 schema 的拷贝。完整约束见各层 Schema。</p>
+
+  <h3>身份与分层</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>字段</th><th>出现层</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>kind</code></td><td>全部</td><td>常量：<code>ip</code> | <code>subsystem</code> | <code>soc</code></td></tr>
+      <tr><td><code>name</code></td><td>全部</td><td>蛇形标识，<code>^[a-z][a-z0-9_]*$</code></td></tr>
+      <tr><td><code>version</code></td><td>全部</td><td>契约版本（semver-ish）；无 VLNV 强制要求</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>端口：<code>role</code> vs <code>bus_role</code>、bundle、时钟域</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>字段</th><th>含义</th><th>取值 / 注意</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>ports[].name/dir/width</code></td>
+        <td>信号名、方向、位宽</td>
+        <td><code>dir</code>: <code>in</code>|<code>out</code>|<code>inout</code>；必填</td>
+      </tr>
+      <tr>
+        <td><code>ports[].protocol</code></td>
+        <td>逻辑协议标签</td>
+        <td>如 <code>apb3</code>、<code>axi4lite</code>、<code>irq</code>、<code>uart</code>、<code>raw</code></td>
+      </tr>
+      <tr>
+        <td><code>ports[].role</code></td>
+        <td><strong>协议内信号角色</strong></td>
+        <td>如 <code>psel</code> / <code>pready</code> / <code>txd</code>。<strong>不要</strong>把 initiator/target 写在这里</td>
+      </tr>
+      <tr>
+        <td><code>ports[].bus_role</code></td>
+        <td><strong>总线端点角色</strong>（可选）</td>
+        <td><code>initiator</code> | <code>target</code> | <code>monitor</code> | <code>passthrough</code>；同一逻辑总线宜同值</td>
+      </tr>
+      <tr>
+        <td><code>ports[].bundle</code></td>
+        <td>逻辑接口组 id（可选）</td>
+        <td>如 <code>apb_s</code>；与 <code>connections.kind: bundle</code> 配合整组连线</td>
+      </tr>
+      <tr>
+        <td><code>ports[].clock_domain</code></td>
+        <td>时钟域标签（可选）</td>
+        <td>常与 <code>clocks[].name</code> / SoC <code>clock_tree</code> 名对齐；非 HDL 端口</td>
+      </tr>
+      <tr>
+        <td><code>ports[].cdc</code></td>
+        <td>CDC 意图（可选）</td>
+        <td><code>none</code> | <code>crossing</code> | <code>async_handshake</code> | <code>unknown</code></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout ok">
+    <strong>记忆口诀</strong>
+    <code>role</code> = 线在协议里叫什么（PSEL…）；<code>bus_role</code> = 这块接口站主端还是从端。二者绝不混用。
+  </div>
+
+  <h3>连接、时钟复位树、地址、参数</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>字段</th><th>层</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>connections[].from/to</code></td>
+        <td>SoC</td>
+        <td>端点：<code>instance.port</code> | <code>clock:&lt;n&gt;</code> | <code>reset:&lt;n&gt;</code> | <code>pad:&lt;n&gt;</code> | <code>const:&lt;v&gt;</code>（const 仅作 from）</td>
+      </tr>
+      <tr>
+        <td><code>connections[].kind</code> / <code>links[].kind</code></td>
+        <td>SoC / Subsys</td>
+        <td><code>port</code>（默认，单信号）| <code>bundle</code>（整组；sink 侧同 bundle 端口须覆盖完整）</td>
+      </tr>
+      <tr>
+        <td><code>links[]</code></td>
+        <td>Subsystem</td>
+        <td>子系统内部实例间连线</td>
+      </tr>
+      <tr>
+        <td><code>clock_tree</code> / <code>reset_tree</code></td>
+        <td>SoC</td>
+        <td>顶层时钟/复位源；复位带 <code>polarity</code>（须匹配 sink 契约）</td>
+      </tr>
+      <tr>
+        <td><code>clocks[]</code> / <code>resets[]</code></td>
+        <td>IP</td>
+        <td>IP 所需时钟与复位（含极性、async）</td>
+      </tr>
+      <tr>
+        <td><code>address_map</code></td>
+        <td>SoC / Subsys</td>
+        <td>SoC 为绝对 <code>base</code>（int 或 <code>0x…</code>）；子系统为相对 <code>base_offset</code>。无说明的重叠视为错误</td>
+      </tr>
+      <tr>
+        <td><code>memory_maps</code></td>
+        <td>IP</td>
+        <td>可选寄存器窗（name/offset/width/access）；不做完整 bitfield 手册</td>
+      </tr>
+      <tr>
+        <td><code>parameters</code></td>
+        <td>IP + 实例覆盖</td>
+        <td>IP 声明 <code>type</code>+<code>default</code>；实例 <code>parameters</code> 只能覆盖已声明键</td>
+      </tr>
+      <tr>
+        <td><code>pads[]</code></td>
+        <td>SoC</td>
+        <td>片外焊盘；经 <code>pad:&lt;name&gt;</code> 参与 connections</td>
+      </tr>
+      <tr>
+        <td><code>exports</code></td>
+        <td>Subsystem</td>
+        <td>向上暴露的 clocks/resets/ports（可带 bundle / bus_role / cdc）</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="block" id="规则与场景">
+  <h2>5. 规则与场景</h2>
+  <p>完整条文：<a href="../rules/integration_rules.md"><code>rules/integration_rules.md</code></a>。场景 walkthrough：<a href="../rules/scenarios.md"><code>rules/scenarios.md</code></a>。</p>
+
+  <h3>连线合法性摘要</h3>
+  <ul>
+    <li>端点必须可解析（实例端口 / clock / reset / pad / const）。</li>
+    <li>位宽一致（或显式切片并在 YAML 写明）。</li>
+    <li>两端都声明 <code>protocol</code> 时必须相等。</li>
+    <li>同 bundle / 同协议组：优先单一 <code>clock_domain</code>；跨域须标 <code>cdc</code>。</li>
+    <li><code>kind: bundle</code> 时，sink 侧该 bundle 全覆盖，否则错误。</li>
+    <li>复位极性匹配；必需时钟/复位默认不得悬空。</li>
+  </ul>
+
+  <h3>场景 S1–S8 摘要</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>场景</th><th>人话意图</th><th>主要编辑</th><th>关键字段</th></tr></thead>
+    <tbody>
+      <tr><td>S1</td><td>加一个 UART（APB）</td><td>新/复用 <code>ip/*.yaml</code> + 实例</td><td><code>kind: ip</code>, ports/clocks/resets/parameters</td></tr>
+      <tr><td>S2</td><td>整组 APB slave 接到 fabric</td><td><code>kind: bundle</code> + <code>instance.bundle:id</code>（demo: host0→periph0）</td><td><code>port.bundle</code>, <code>connections.kind</code></td></tr>
+      <tr><td>S3</td><td>外设映到 0x4000_0000</td><td>SoC/子系统 address_map</td><td><code>base</code> / <code>base_offset</code>, size, target</td></tr>
+      <tr><td>S4</td><td>用 sys_clk / sys_rstn 驱动岛</td><td>clock/reset tree + connections</td><td><code>clock_tree</code>, <code>reset_tree</code>, <code>clock_domain</code></td></tr>
+      <tr><td>S5</td><td>UART IRQ 接到控制器/焊盘</td><td>irq 端口 + connections（+ pads）</td><td><code>protocol: irq</code>, connections</td></tr>
+      <tr><td>S6</td><td>UART TX/RX 上焊盘</td><td>声明 pads + <code>pad:</code> 连线</td><td><code>pads</code>, from/to</td></tr>
+      <tr><td>S7</td><td>IRQ 从 pclk 跨到 aon_clk</td><td>两端 domain + cdc 标记；见 <code>demo_soc</code> + <code>aon_clk</code></td><td><code>clock_domain</code>, <code>cdc</code></td></tr>
+      <tr><td>S8</td><td>FIFO depth 32</td><td>实例 parameters（键须在 IP 上）</td><td>IP <code>parameters</code> + instance override</td></tr>
+      <tr><td>S9</td><td>地址译码 fabric / ready OR</td><td><code>fabric[]</code> decode_mux</td><td><code>match.base</code>, ready/rdata_merge</td></tr>
+      <tr><td>S10</td><td>异构从设备适配</td><td><code>adapters[]</code> + fabric slave</td><td><code>maps</code>, <code>omit_from_roles</code></td></tr>
+      <tr><td>S11</td><td>bit-slice IRQ</td><td><code>port[N]</code> / <code>[M:N]</code></td><td>有效位宽一致</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>完整「人话 → 必填字段」匹配表见下一节 <a href="#连连看">连连看</a> 与 <a href="../rules/nl_field_map.md"><code>rules/nl_field_map.md</code></a>。</p>
+</section>
+
+<!-- 5b 连连看 -->
+<section class="block" id="连连看">
+  <h2>5b. 连连看：NL 场景 ↔ 必填字段清单</h2>
+  <p><strong>目的：</strong>减少 Agent 对字段名的瞎猜。收到模糊或多段自然语言时，先把意图拆成短语，在左列匹配（中/英），只填右列 <strong>Must</strong>；Optional 仅在人明确要求时写。真源文件：<a href="../rules/nl_field_map.md"><code>rules/nl_field_map.md</code></a>；起手 prompt：<a href="../prompts/scenario_match.md"><code>prompts/scenario_match.md</code></a>。</p>
+  <div class="callout" style="background:var(--accent-soft);border-left:4px solid var(--accent);padding:0.75rem 1rem;margin:1rem 0;border-radius:6px;">
+    <strong>Agent 步骤</strong>
+    ① 拆意图 → ② 匹配 M1–M13 → ③ 只改 Must 路径 → ④ <code>validate.py</code> → ⑤ 报告「命中行 ID + 改动文件 + 校验结果」。
+  </div>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>ID</th><th>人话意图（中 / EN）</th><th>Must（必填路径）</th><th>Done</th></tr></thead>
+    <tbody>
+      <tr><td>M1</td><td>单信号互连 / <em>wire port</em></td><td><code>connections[].from</code>, <code>.to</code></td><td>端点可解析；有效位宽一致</td></tr>
+      <tr><td>M2</td><td>整组 bundle / <em>bundle connect</em></td><td><code>ports[].bundle</code> + <code>kind: bundle</code> + <code>instance.bundle:&lt;id&gt;</code></td><td>跨文件闭包；sink 成员全覆盖</td></tr>
+      <tr><td>M3</td><td>地址映射 / <em>map at 0x…</em></td><td><code>address_map[]</code>：<code>base</code>/<code>base_offset</code>, <code>size_bytes</code>, <code>target</code></td><td>无未解释重叠</td></tr>
+      <tr><td>M4</td><td>时钟复位 / <em>sys_clk / sys_rstn</em></td><td><code>clock_tree</code>/<code>reset_tree</code> + <code>clock:</code>/<code>reset:</code> 连线</td><td>极性匹配；必需口不悬空</td></tr>
+      <tr><td>M5</td><td>焊盘 IO / <em>pads</em></td><td><code>pads[]</code> + <code>pad:&lt;name&gt;</code></td><td>方向与宽度匹配</td></tr>
+      <tr><td>M6</td><td>CDC 跨钟 / <em>crossing</em></td><td>两端 <code>clock_domain</code> + <code>cdc</code></td><td>异域须标 cdc；非签核</td></tr>
+      <tr><td>M7</td><td>译码 fabric / <em>decode_mux</em></td><td><code>fabric[].kind: decode_mux</code>, <code>master</code>, <code>slaves[].match.base</code>/<code>size_bytes</code></td><td>窗检查过；不生成 HDL</td></tr>
+      <tr><td>M8</td><td>异构适配 / <em>adapter</em></td><td><code>adapters[]</code> + <code>maps[]</code> + <code>fabric.slaves[].adapter</code></td><td><code>to_port</code> 存在；省略列入 omit</td></tr>
+      <tr><td>M9</td><td>位切片 / <em>irq[5]</em></td><td><code>instance.port[N]</code> 或 <code>[M:N]</code></td><td>切片在范围内；有效位宽相等</td></tr>
+      <tr><td>M10</td><td>主从配对 / <em>bus_role A</em></td><td>两端（需强制时）<code>ports[].bus_role</code></td><td>都填 initiator/target → 须互补；漏填不报错</td></tr>
+      <tr><td>M11</td><td>加 IP / <em>add UART</em></td><td><code>kind: ip</code> + <code>instances[].ip</code>/<code>ref</code></td><td>实例可解析</td></tr>
+      <tr><td>M12</td><td>改参数 / <em>FIFO depth</em></td><td>IP <code>parameters</code> + 实例覆盖</td><td>无未知键</td></tr>
+      <tr><td>M13</td><td>IRQ 整线 / <em>wire IRQ</em></td><td><code>protocol: irq</code> + <code>connections</code>（± pads）</td><td>端点可解析；切片改走 M9</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Optional 列、短语速查、与 S1–S11 对照见 markdown 全文。本版<strong>未</strong>实现：spimem_cfg 专用 adapter 硬化、连接方向静态度量、强制 fabric↔connections 一一对应（仅作未来项）。</p>
+</section>
+
+<!-- 6 -->
+<section class="block" id="如何使用">
+  <h2>6. 如何在 Workbuddy / Claude Code / DeepSeek harness 使用</h2>
+  <p>把本目录放到芯片仓库旁（submodule 或拷贝），用自然语言提集成意图。</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Harness</th><th>入口</th><th>做法</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Claude Code</strong></td>
+        <td><a href="../CLAUDE.md"><code>CLAUDE.md</code></a></td>
+        <td>自动转读 <code>AGENTS.md</code>；改 YAML 后跑 validate</td>
+      </tr>
+      <tr>
+        <td><strong>Workbuddy / Cursor 类</strong></td>
+        <td><a href="../.cursorrules"><code>.cursorrules</code></a> + <a href="../WORKBUDDY.md"><code>WORKBUDDY.md</code></a></td>
+        <td>打开本目录为项目；遵循 AGENTS.md</td>
+      </tr>
+      <tr>
+        <td><strong>DeepSeek harness / Pi / 通用</strong></td>
+        <td><a href="../AGENTS.md"><code>AGENTS.md</code></a></td>
+        <td>系统 brief 指向该文件</td>
+      </tr>
+      <tr>
+        <td><strong>起手 prompt</strong></td>
+        <td><a href="../prompts/integrate.md"><code>prompts/integrate.md</code></a></td>
+        <td>复制进会话，填入具体意图与约束</td>
+      </tr>
+      <tr>
+        <td><strong>连连看</strong></td>
+        <td><a href="../rules/nl_field_map.md"><code>rules/nl_field_map.md</code></a> + <a href="../prompts/scenario_match.md"><code>prompts/scenario_match.md</code></a></td>
+        <td>模糊意图先匹配 M1–M13，再改 YAML</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <pre><code>cd /path/to/MoonGlass_Integration
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python tools/validate.py          # 默认校验 examples/
+.venv/bin/python tools/validate.py path/to/yaml…
+.venv/bin/python tools/validate.py --root /path/to/chip_repo soc.yaml
+# MOONGLASS_INTEGRATION_ROOTS；--no-examples-fallback</code></pre>
+</section>
+
+<!-- 7 -->
+<section class="block" id="校验与完成定义">
+  <h2>7. 校验与「完成」定义</h2>
+  <p><a href="../tools/validate.py"><code>tools/validate.py</code></a> 是<strong>规则执行器</strong>，不是集成器。它做：JSON Schema 校验；端口属性枚举/一致性；以及跨文件 bundle 闭包、bus_role 配对（策略 A）、<strong>0.1.3+</strong> 的 <code>fabric</code>/<code>adapters</code>、<strong>0.1.5</strong> 的 bit-slice。解析 <code>ref</code>/<code>ip</code> 仅用于检查，不生成 glue HDL。</p>
+  <p>路径解析顺序：引用文件同目录 → <code>--root</code> / 环境变量 <code>MOONGLASS_INTEGRATION_ROOTS</code> → 本包 <code>examples/</code>（可用 <code>--no-examples-fallback</code> 关闭）。Bundle 端点可用 <code>instance.bundle:&lt;id&gt;</code>。</p>
+  <h3>完成清单（Definition of Done）</h3>
+  <ul>
+    <li>相关 YAML 已更新且仍通过 schema</li>
+    <li><code>python tools/validate.py</code> 退出码 0（或文档化的等价检查）</li>
+    <li>报告生成/修改的 RTL / wrapper / 脚本路径</li>
+    <li>未在 YAML 外发明端口；契约变更须显式点出</li>
+    <li>地址 / 时钟 / 复位 / CDC 意图已反映在 SoC（或子系统）YAML</li>
+  </ul>
+  <div class="callout warn">
+    <strong>Agent 禁区</strong>
+    不得为了「能编过」而静默加宽总线或改极性；先改 YAML（必要时经人确认），再 regenerate。
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="block" id="从业界吸收了什么">
+  <h2>8. 从业界吸收了什么</h2>
+  <p>对照调研见 <a href="../references/"><code>references/</code></a>；映射总表见 <a href="../references/ABSORBED.md"><code>references/ABSORBED.md</code></a>。吸收的是<strong>通用意图</strong>（接口分组、主从、时钟复位、地址窗、连线），落到<strong>自研字段</strong>。禁止复制商用 schema / 专有字段，也禁止宣称与某工具兼容。</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>业界 / prior-art 意图</th><th>本包字段或文件</th></tr></thead>
+    <tbody>
+      <tr><td>总线接口分组</td><td><code>protocol</code> + 可选 <code>bundle</code></td></tr>
+      <tr><td>Initiator / target</td><td><code>bus_role</code>（不是 <code>role</code>）</td></tr>
+      <tr><td>协议内信号角色</td><td><code>role</code></td></tr>
+      <tr><td>时钟 / 复位一等公民</td><td>IP <code>clocks/resets</code>；SoC <code>clock_tree</code> / <code>reset_tree</code></td></tr>
+      <tr><td>CDC 意识</td><td><code>clock_domain</code> + <code>cdc</code></td></tr>
+      <tr><td>单信号 vs 接口级连线</td><td><code>connections.kind</code>: port | bundle</td></tr>
+      <tr><td>地址段</td><td><code>address_map</code> / <code>memory_maps</code></td></tr>
+      <tr><td>参数 / generics</td><td><code>parameters</code> + 实例覆盖</td></tr>
+      <tr><td>组件身份</td><td><code>name</code> + <code>version</code> + <code>kind</code>（无强制 VLNV）</td></tr>
+      <tr><td>NL→编辑工作流</td><td><code>AGENTS.md</code>, <code>scenarios.md</code>, <code>integration_rules.md</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout warn">
+    <strong>专利与兼容性警示</strong>
+    商用格式可能涉及专利与知识产权。本包<strong>不</strong>声称兼容 IP-XACT / Vivado / coreTools / Socrates 等；references 仅作 prior-art 意识。执行集成时不要改 schemas 去迁就外部格式。
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="block" id="仍缺及原因">
+  <h2>9. 缺口状态（已做 / 有意未做）</h2>
+  <p>0.1.2 已交付 <strong>9.1 / 9.2 / 9.3</strong>；0.1.3–0.1.5 又补上 PicoSoC 实测缺口：<strong>fabric decode/mux</strong>、<strong>adapters</strong>、<strong>bit-slice</strong>。下列 <strong>9.4 / 9.5</strong> 仍为有意保留。跨文件/fabric 能力仅用于<strong>校验</strong>，本包仍不是永久集成器。</p>
+
+  <div class="gap-item" style="border-left:4px solid var(--accent);padding-left:0.85rem;margin:1rem 0;">
+    <h3>9.1 跨文件 bundle 闭包校验 — <span style="color:var(--accent)">已做（0.1.2）</span></h3>
+    <dl class="why">
+      <dt>做什么</dt>
+      <dd>校验器按约定解析 <code>instance.ref</code> / <code>instance.ip</code>，对 <code>kind: bundle</code> 连接加载子 YAML，核对 sink 侧 bundle 成员是否被 source 覆盖，并检查位宽 / protocol。端点推荐 <code>instance.bundle:&lt;id&gt;</code>（两端本地 bundle 名可不同，如 <code>apb_m</code>↔<code>apb_s</code>）。</dd>
+      <dt>路径解析顺序</dt>
+      <dd>① 引用 YAML 同目录（含 <code>{ip,subsys,soc}/</code> 子目录）；② <code>--root</code> / <code>MOONGLASS_INTEGRATION_ROOTS</code>；③ 本包 <code>examples/</code> 回退。缺失文件、kind 不符、name≠ref、循环引用 → 报错。</dd>
+      <dt>示例</dt>
+      <dd><code>examples/soc/demo_soc.yaml</code>：<code>host0.bundle:apb_m</code> → <code>periph0.bundle:apb_s</code>；host IP 为 <code>examples/ip/apb_host_stub.yaml</code>。</dd>
+      <dt>边界</dt>
+      <dd>只做检查，不生成 glue HDL，不自称 elaborator 产品。</dd>
+    </dl>
+  </div>
+
+  <div class="gap-item" style="border-left:4px solid var(--accent);padding-left:0.85rem;margin:1rem 0;">
+    <h3>9.2 initiator↔target 配对（策略 A）— <span style="color:var(--accent)">已做（0.1.2）</span></h3>
+    <dl class="why">
+      <dt>做什么</dt>
+      <dd>在跨文件端点解析之后：若<strong>两端都</strong>填写了 <code>bus_role</code> 且落在 <code>{initiator,target}</code>，则必须互补（initiator↔target）。任一端省略 → <strong>不报错</strong>。同 bundle / 同 protocol 内部一致性检查仍保留。</dd>
+      <dt>monitor / passthrough</dt>
+      <dd><code>monitor</code> 可挂任一侧；<code>passthrough</code> 视为桥 — 不因此误报配对失败。仅当两端都是 initiator/target 时强制互补。</dd>
+    </dl>
+  </div>
+
+  <div class="gap-item" style="border-left:4px solid var(--accent);padding-left:0.85rem;margin:1rem 0;">
+    <h3>9.3 多时钟 CDC 示例 — <span style="color:var(--accent)">已做（0.1.2）</span></h3>
+    <dl class="why">
+      <dt>做什么</dt>
+      <dd><code>demo_soc</code> 增加 <code>aon_clk</code>；UART IRQ（<code>periph0.irq_uart</code>，源域 <code>pclk</code>，<code>cdc: crossing</code>）连到 <code>pad:irq_uart_aon</code>，connection <code>note</code> 写明需同步进 aon 域。场景 S7 指向这些文件。</dd>
+      <dt>边界</dt>
+      <dd><strong>意图标记</strong>给 Agent 用，<strong>不是</strong>签核级 CDC（不自动插同步器网表、不替代约束/签核证据）。</dd>
+    </dl>
+  </div>
+
+  <div class="gap-item">
+    <h3>9.3b fabric decode/mux — <span style="color:var(--accent)">已做（0.1.3）</span></h3>
+    <p>SoC <code>fabric[]</code>：<code>kind: decode_mux</code> + slaves 地址窗 + <code>ready_merge</code>/<code>rdata_merge</code>。校验窗口与 master 端点；不生成 HDL。</p>
+    <h3>9.3c adapters（异构从设备）— <span style="color:var(--accent)">已做（0.1.4）</span></h3>
+    <p><code>adapters[]</code>（<code>partial_map</code>/<code>width_remap</code>/<code>bridge</code>）由 <code>fabric.slaves[].adapter</code> 引用；检查 <code>to_port</code> 与宽度。</p>
+    <h3>9.3d bit-slice 端点 — <span style="color:var(--accent)">已做（0.1.5）</span></h3>
+    <p><code>instance.port[N]</code> / <code>[M:N]</code>；有效位宽参与连线检查。示例：<code>pad:irq_5</code>→<code>cpu.irq[5]</code>。</p>
+    <h3>9.3e 连连看 NL↔字段 — <span style="color:var(--accent)">已做（0.1.6）</span></h3>
+    <p>文档/prompt：<code>rules/nl_field_map.md</code> + <code>prompts/scenario_match.md</code>。无新 schema。未来可选（未做）：连接方向检查、fabric↔connections 强制、专用 spimem_cfg adapter 硬化。</p>
+    <h3>9.4 寄存器 bitfield / VLNV / 厂商互换 / GUI — 有意未做</h3>
+    <dl class="why">
+      <dt>刻意不吸收</dt>
+      <dd>完整寄存器 bitfield / RAL 电子手册；强制 VLNV 目录；厂商工具互换格式；GUI / Block Design 画布坐标；专有 TCL / coreKit；把 Scala Diplomacy / LiteX 运行时对象当 YAML 真源。</dd>
+      <dt>原因</dt>
+      <dd>（1）专利与知识产权风险；（2）与「Agent + YAML 最小真源」冗余或偏离——本包装配关心接口/地址/时钟复位/连线，不关心 BD 布局或厂商目录编号。</dd>
+    </dl>
+  </div>
+
+  <div class="gap-item">
+    <h3>9.5 不做永久集成工具产品 — 有意未做</h3>
+    <dl class="why">
+      <dt>原则</dt>
+      <dd>协议与结构清楚之后，AI 可现场定制 glue。本包提供契约与规则；Agent 可写一次性 helper。把「永久集成器」产品化会与此冲突。0.1.2 的跨文件能力<strong>仅限校验</strong>，不改变这条边界。</dd>
+      <dt>与 MoonGlass</dt>
+      <dd>MoonGlass 可后续托管/检查这些描述；它不替代 Agent elaborator，本包也不把集成器塞进 MoonGlass。</dd>
+    </dl>
+  </div>
+
+  <div class="callout gap">
+    <strong>读缺口时请记住</strong>
+    「缺」≠「漏」。0.1.6-draft：契约可读、单文件 + 跨文件闭包可校验、场景可映射、<strong>连连看</strong>可匹配必填字段、Agent 有清晰禁区——而不是假装已是全功能 SoC 装配器。
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="block" id="版本与相关路径">
+  <h2>10. 版本与相关路径</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>项</th><th>值</th></tr></thead>
+    <tbody>
+      <tr><td>包版本</td><td><code>0.1.6-draft</code>（见 <a href="../VERSION"><code>VERSION</code></a>、<a href="../CHANGELOG.md"><code>CHANGELOG.md</code></a>）</td></tr>
+      <tr><td>本说明 HTML</td><td><code>/workspace/MoonGlass_Integration/docs/MoonGlass_Integration说明.html</code></td></tr>
+      <tr><td>仓库根（本机）</td><td><code>/workspace/MoonGlass_Integration/</code></td></tr>
+      <tr><td>Agent brief</td><td><a href="../AGENTS.md"><code>../AGENTS.md</code></a></td></tr>
+      <tr><td>规则</td><td><a href="../rules/integration_rules.md"><code>../rules/integration_rules.md</code></a> · <a href="../rules/scenarios.md"><code>../rules/scenarios.md</code></a> · <a href="../rules/nl_field_map.md"><code>../rules/nl_field_map.md</code></a>（连连看）</td></tr>
+      <tr><td>吸收映射</td><td><a href="../references/ABSORBED.md"><code>../references/ABSORBED.md</code></a></td></tr>
+      <tr><td>校验</td><td><a href="../tools/validate.py"><code>../tools/validate.py</code></a></td></tr>
+      <tr><td>License</td><td>社区试用稿，目标对齐 MoonGlass <strong>PolyForm Noncommercial</strong>（正式文案 TBD）</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>曾用拼写 <em>MoonGlass_Intergration</em> 为笔误；正确名称为 <strong>MoonGlass_Integration</strong>。</p>
+</section>
+
+<footer class="page-foot">
+  MoonGlass_Integration · 说明文档 · 0.1.6-draft · 单文件自包含 · 请以 schemas/ 与 AGENTS.md 为执行真源
+</footer>
+</main>
+</div>
+</body>
+</html>

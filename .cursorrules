@@ -1,0 +1,12 @@
+# MoonGlass_Integration (Cursor / Workbuddy-style)
+
+Canonical brief: AGENTS.md. Schemas: schemas/*.schema.json. Rules: rules/integration_rules.md.
+
+You assemble SoC structure from YAML contracts (ip_interface / subsystem / soc_top).
+Natural language = intent; YAML = truth. Validate with tools/validate.py before done.
+Never invent ports that contradict YAML. Do not build a heavyweight integration engine;
+one-off helper scripts OK. MoonGlass may host these descriptions later — this pack does not wire chips inside MoonGlass.
+
+Spelling: project is MoonGlass_Integration (not Intergration).
+
+Fuzzy NL → open rules/nl_field_map.md (连连看): match intent phrases to Must field paths before editing YAML. Starter: prompts/scenario_match.md.

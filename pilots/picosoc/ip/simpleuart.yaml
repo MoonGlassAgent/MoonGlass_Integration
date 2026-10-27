@@ -1,0 +1,104 @@
+kind: ip
+name: simpleuart
+version: 0.1.0
+description: >
+  PicoSoC simpleuart — register ports are NOT picorv32_mem. SoC inline decode
+  drives reg_*_we/re from mem_valid && exact address. Cite picosoc/simpleuart.v.
+hdl:
+  module: simpleuart
+  files:
+    - https://github.com/YosysHQ/picorv32/blob/ef203c2b0a3fb793280f5114941416c425c5b461/picosoc/simpleuart.v
+parameters:
+  DEFAULT_DIV:
+    type: int
+    default: 1
+clocks:
+  - name: clk
+    frequency_hz: null
+resets:
+  - name: resetn
+    polarity: active_low
+    async: true
+ports:
+  - name: ser_tx
+    dir: out
+    width: 1
+    protocol: uart
+    role: txd
+  - name: ser_rx
+    dir: in
+    width: 1
+    protocol: uart
+    role: rxd
+  - name: reg_div_we
+    dir: in
+    width: 4
+    protocol: picosoc_uart_reg
+    role: div_we
+    clock_domain: clk
+    cdc: none
+  - name: reg_div_di
+    dir: in
+    width: 32
+    protocol: picosoc_uart_reg
+    role: div_di
+    clock_domain: clk
+    cdc: none
+  - name: reg_div_do
+    dir: out
+    width: 32
+    protocol: picosoc_uart_reg
+    role: div_do
+    clock_domain: clk
+    cdc: none
+  - name: reg_dat_we
+    dir: in
+    width: 1
+    protocol: picosoc_uart_reg
+    role: dat_we
+    clock_domain: clk
+    cdc: none
+  - name: reg_dat_re
+    dir: in
+    width: 1
+    protocol: picosoc_uart_reg
+    role: dat_re
+    clock_domain: clk
+    cdc: none
+  - name: reg_dat_di
+    dir: in
+    width: 32
+    protocol: picosoc_uart_reg
+    role: dat_di
+    clock_domain: clk
+    cdc: none
+  - name: reg_dat_do
+    dir: out
+    width: 32
+    protocol: picosoc_uart_reg
+    role: dat_do
+    clock_domain: clk
+    cdc: none
+  - name: reg_dat_wait
+    dir: out
+    width: 1
+    protocol: picosoc_uart_reg
+    role: dat_wait
+    clock_domain: clk
+    cdc: none
+memory_maps:
+  - name: regs
+    bus: picosoc_uart_reg
+    base_offset: 0
+    size_bytes: 12
+    registers:
+      - name: DIV
+        offset: 0x4
+        width: 32
+        access: rw
+        description: Absolute SoC addr 0x02000004 — clock/baud divider
+      - name: DAT
+        offset: 0x8
+        width: 32
+        access: rw
+        description: Absolute SoC addr 0x02000008 — TX write / RX read

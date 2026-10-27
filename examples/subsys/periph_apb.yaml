@@ -1,0 +1,151 @@
+kind: subsystem
+name: periph_apb
+version: 0.1.0
+description: APB peripheral island — UART + GPIO behind one upward APB window.
+instances:
+  - id: uart0
+    ip: uart_apb
+    parameters:
+      FIFO_DEPTH: 16
+  - id: gpio0
+    ip: gpio_apb
+    parameters:
+      WIDTH: 8
+links: []
+exports:
+  clocks:
+    - name: pclk
+      maps_to: uart0.pclk
+  resets:
+    - name: presetn
+      maps_to: uart0.presetn
+  ports:
+    # Upward APB — demux/decode is agent-elaborated; exports declare the contract.
+    - name: psel
+      dir: in
+      width: 1
+      protocol: apb3
+      role: psel
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.psel
+      description: Top-level select into this island (decode splits to uart0/gpio0)
+    - name: penable
+      dir: in
+      width: 1
+      protocol: apb3
+      role: penable
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.penable
+    - name: pwrite
+      dir: in
+      width: 1
+      protocol: apb3
+      role: pwrite
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.pwrite
+    - name: paddr
+      dir: in
+      width: 16
+      protocol: apb3
+      role: paddr
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.paddr
+    - name: pwdata
+      dir: in
+      width: 32
+      protocol: apb3
+      role: pwdata
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.pwdata
+    - name: prdata
+      dir: out
+      width: 32
+      protocol: apb3
+      role: prdata
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.prdata
+    - name: pready
+      dir: out
+      width: 1
+      protocol: apb3
+      role: pready
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.pready
+    - name: pslverr
+      dir: out
+      width: 1
+      protocol: apb3
+      role: pslverr
+      bus_role: target
+      bundle: apb_s
+      clock_domain: pclk
+      cdc: none
+      maps_to: uart0.pslverr
+    - name: uart_txd
+      dir: out
+      width: 1
+      protocol: uart
+      maps_to: uart0.uart_txd
+    - name: uart_rxd
+      dir: in
+      width: 1
+      protocol: uart
+      maps_to: uart0.uart_rxd
+    - name: gpio_out
+      dir: out
+      width: 8
+      protocol: gpio
+      maps_to: gpio0.gpio_out
+    - name: gpio_in
+      dir: in
+      width: 8
+      protocol: gpio
+      maps_to: gpio0.gpio_in
+    - name: gpio_oe
+      dir: out
+      width: 8
+      protocol: gpio
+      maps_to: gpio0.gpio_oe
+    - name: irq_uart
+      dir: out
+      width: 1
+      protocol: irq
+      clock_domain: pclk
+      cdc: crossing
+      maps_to: uart0.irq
+      description: Crosses to aon_clk at SoC (intent markup; not signoff CDC)
+    - name: irq_gpio
+      dir: out
+      width: 1
+      protocol: irq
+      maps_to: gpio0.irq
+address_map:
+  - instance: uart0
+    base_offset: 0x0000
+    size_bytes: 4096
+    bus: apb
+  - instance: gpio0
+    base_offset: 0x1000
+    size_bytes: 256
+    bus: apb

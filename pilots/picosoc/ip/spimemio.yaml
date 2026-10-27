@@ -1,0 +1,157 @@
+kind: ip
+name: spimemio
+version: 0.1.0
+description: >
+  SPI flash memory I/O — XIP read path (valid/ready/addr/rdata) plus cfgreg
+  and quad SPI pads. Addr is 24-bit in RTL; PicoSoC gates valid by address
+  decode (not a clean picorv32_mem target). Cite picosoc/spimemio.v.
+hdl:
+  module: spimemio
+  files:
+    - https://github.com/YosysHQ/picorv32/blob/ef203c2b0a3fb793280f5114941416c425c5b461/picosoc/spimemio.v
+clocks:
+  - name: clk
+    frequency_hz: null
+resets:
+  - name: resetn
+    polarity: active_low
+    async: true
+ports:
+  # XIP read — heterogeneous vs full picorv32_mem (no wdata/wstrb; addr 24b)
+  - name: valid
+    dir: in
+    width: 1
+    protocol: spimemio_xip
+    role: valid
+    bus_role: target
+    clock_domain: clk
+    cdc: none
+  - name: ready
+    dir: out
+    width: 1
+    protocol: spimemio_xip
+    role: ready
+    bus_role: target
+    clock_domain: clk
+    cdc: none
+  - name: addr
+    dir: in
+    width: 24
+    protocol: spimemio_xip
+    role: addr
+    bus_role: target
+    clock_domain: clk
+    cdc: none
+    description: RTL [23:0]; SoC passes mem_addr[23:0]
+  - name: rdata
+    dir: out
+    width: 32
+    protocol: spimemio_xip
+    role: rdata
+    bus_role: target
+    clock_domain: clk
+    cdc: none
+  # Config register sideband (addr 0x02000000 via decode)
+  - name: cfgreg_we
+    dir: in
+    width: 4
+    protocol: spimemio_cfg
+    role: we
+    clock_domain: clk
+    cdc: none
+  - name: cfgreg_di
+    dir: in
+    width: 32
+    protocol: spimemio_cfg
+    role: di
+    clock_domain: clk
+    cdc: none
+  - name: cfgreg_do
+    dir: out
+    width: 32
+    protocol: spimemio_cfg
+    role: do
+    clock_domain: clk
+    cdc: none
+  # Flash pads
+  - name: flash_csb
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: csb
+  - name: flash_clk
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: sck
+  - name: flash_io0_oe
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io0_oe
+  - name: flash_io1_oe
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io1_oe
+  - name: flash_io2_oe
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io2_oe
+  - name: flash_io3_oe
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io3_oe
+  - name: flash_io0_do
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io0_do
+  - name: flash_io1_do
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io1_do
+  - name: flash_io2_do
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io2_do
+  - name: flash_io3_do
+    dir: out
+    width: 1
+    protocol: spiflash
+    role: io3_do
+  - name: flash_io0_di
+    dir: in
+    width: 1
+    protocol: spiflash
+    role: io0_di
+  - name: flash_io1_di
+    dir: in
+    width: 1
+    protocol: spiflash
+    role: io1_di
+  - name: flash_io2_di
+    dir: in
+    width: 1
+    protocol: spiflash
+    role: io2_di
+  - name: flash_io3_di
+    dir: in
+    width: 1
+    protocol: spiflash
+    role: io3_di
+memory_maps:
+  - name: cfgreg
+    bus: spimemio_cfg
+    base_offset: 0
+    size_bytes: 4
+    registers:
+      - name: CFG
+        offset: 0
+        width: 32
+        access: rw
+        description: SPI memio enable / QSPI / dummy / bitbang (see picosoc README)
