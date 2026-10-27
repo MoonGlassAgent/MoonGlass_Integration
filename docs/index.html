@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MoonGlass_Intergration · 漫画介绍</title>
+  <meta name="description" content="漫画式介绍 MoonGlass_Intergration：YAML 合约驱动的 SoC 组装规则包。Agent-as-Elaborator，不是永久集成器。" />
+  <meta property="og:title" content="MoonGlass_Intergration · 漫画介绍" />
+  <meta property="og:description" content="YAML contracts + rules pack for description-driven SoC assembly. Fun comic strip intro." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="comic.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div class="hero-badge">✨ 0.1.6-draft · 开源规则包</div>
+      <h1>MoonGlass<span class="slash">_</span>Intergration</h1>
+      <p class="tagline">
+        用漫画讲清楚：YAML 合约 + 规则，让 Agent 自己「阐述」SoC 顶层连线。<br />
+        <strong>Rules pack</strong>, not a forever integrator.
+      </p>
+      <p class="wink">（仓库名故意写成 Intergration；文件夹里常写 Integration —— 拼写梗，懂的都懂 😉）</p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/MoonGlassAgent/MoonGlass_Intergration">📦 GitHub 仓库</a>
+        <a class="btn secondary" href="./MoonGlass_Integration说明.html">📖 中文说明</a>
+        <a class="btn purple" href="https://github.com/MoonGlassAgent/MoonGlass_Intergration#怎么用">▶ try validate.py</a>
+      </div>
+    </header>
+
+    <p class="strip-title">故事开始 · The Strip</p>
+
+    <main class="comic" aria-label="MoonGlass_Intergration comic strip">
+
+      <!-- Panel 1: Chaos -->
+      <article class="panel chaos">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">1</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- tangled wires -->
+            <path d="M20 30 C60 10, 40 80, 90 50 S140 20, 160 70" fill="none" stroke="#e74c3c" stroke-width="3" stroke-linecap="round"/>
+            <path d="M15 90 C50 120, 80 40, 110 100 S150 130, 165 80" fill="none" stroke="#ff6b35" stroke-width="3" stroke-linecap="round"/>
+            <path d="M30 120 C70 60, 100 140, 150 40" fill="none" stroke="#7c5cff" stroke-width="2.5" stroke-dasharray="4 3"/>
+            <!-- stick engineer panicking -->
+            <circle cx="90" cy="55" r="14" fill="#ffe66d" stroke="#1a1a2e" stroke-width="2.5"/>
+            <line x1="90" y1="69" x2="90" y2="100" stroke="#1a1a2e" stroke-width="2.5"/>
+            <line x1="90" y1="78" x2="68" y2="95" stroke="#1a1a2e" stroke-width="2.5"/>
+            <line x1="90" y1="78" x2="115" y2="88" stroke="#1a1a2e" stroke-width="2.5"/>
+            <line x1="90" y1="100" x2="72" y2="125" stroke="#1a1a2e" stroke-width="2.5"/>
+            <line x1="90" y1="100" x2="110" y2="125" stroke="#1a1a2e" stroke-width="2.5"/>
+            <!-- sweat -->
+            <ellipse cx="108" cy="42" rx="3" ry="5" fill="#4ecdc4"/>
+            <ellipse cx="115" cy="48" rx="2.5" ry="4" fill="#4ecdc4"/>
+            <!-- AI blob -->
+            <rect x="130" y="100" width="36" height="28" rx="8" fill="#7c5cff" stroke="#1a1a2e" stroke-width="2"/>
+            <text x="148" y="119" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">AI</text>
+            <text x="20" y="22" font-size="10" fill="#e74c3c" font-family="sans-serif" font-weight="700">???!!!</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble">
+            SoC 接线像一团毛线——「把 UART 挂上」「地址随便编」……AI 一兴奋就<strong>随便连</strong>。
+            <span class="en">Chaos mode: AI wires whatever feels right. Spoiler: it isn't.</span>
+          </div>
+          <p class="caption">没有合约的集成 = 深夜 debug 派对（没人想来）。</p>
+        </div>
+      </article>
+
+      <!-- Panel 2: YAML contracts -->
+      <article class="panel yaml reverse">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">2</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- three YAML cards -->
+            <rect x="12" y="25" width="48" height="70" rx="6" fill="#fff" stroke="#1a1a2e" stroke-width="2.5"/>
+            <text x="36" y="48" text-anchor="middle" font-size="9" font-weight="700" fill="#4ecdc4" font-family="sans-serif">IP</text>
+            <line x1="20" y1="58" x2="52" y2="58" stroke="#ddd" stroke-width="3"/>
+            <line x1="20" y1="68" x2="48" y2="68" stroke="#ddd" stroke-width="3"/>
+            <line x1="20" y1="78" x2="50" y2="78" stroke="#ddd" stroke-width="3"/>
+
+            <rect x="66" y="35" width="48" height="70" rx="6" fill="#fff" stroke="#1a1a2e" stroke-width="2.5"/>
+            <text x="90" y="58" text-anchor="middle" font-size="8" font-weight="700" fill="#ff6b35" font-family="sans-serif">SUBSYS</text>
+            <line x1="74" y1="68" x2="106" y2="68" stroke="#ddd" stroke-width="3"/>
+            <line x1="74" y1="78" x2="100" y2="78" stroke="#ddd" stroke-width="3"/>
+            <line x1="74" y1="88" x2="104" y2="88" stroke="#ddd" stroke-width="3"/>
+
+            <rect x="120" y="20" width="48" height="70" rx="6" fill="#fff" stroke="#1a1a2e" stroke-width="2.5"/>
+            <text x="144" y="43" text-anchor="middle" font-size="9" font-weight="700" fill="#7c5cff" font-family="sans-serif">SoC</text>
+            <line x1="128" y1="53" x2="160" y2="53" stroke="#ddd" stroke-width="3"/>
+            <line x1="128" y1="63" x2="156" y2="63" stroke="#ddd" stroke-width="3"/>
+            <line x1="128" y1="73" x2="158" y2="73" stroke="#ddd" stroke-width="3"/>
+
+            <!-- happy stick -->
+            <circle cx="90" cy="125" r="10" fill="#ffe66d" stroke="#1a1a2e" stroke-width="2"/>
+            <line x1="90" y1="135" x2="90" y2="148" stroke="#1a1a2e" stroke-width="2"/>
+            <path d="M84 122 Q90 128 96 122" fill="none" stroke="#1a1a2e" stroke-width="1.5"/>
+            <text x="90" y="18" text-anchor="middle" font-size="10" fill="#1a1a2e" font-family="sans-serif" font-weight="700">YAML ✓</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble right">
+            先立<strong>合约</strong>：IP / Subsystem / SoC 三层 YAML + JSON Schema。端口、总线角色、地址图——写清楚再动手。
+            <span class="en">Contracts first. Schemas keep the story honest.</span>
+          </div>
+          <p class="caption">schemas/ · examples/ —— 描述驱动，不是又一个 IP-XACT 克隆。</p>
+        </div>
+      </article>
+
+      <!-- Panel 3: Agent + 连连看 -->
+      <article class="panel agent">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">3</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- agent robot -->
+            <rect x="55" y="40" width="50" height="45" rx="10" fill="#7c5cff" stroke="#1a1a2e" stroke-width="2.5"/>
+            <circle cx="70" cy="58" r="6" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1.5"/>
+            <circle cx="90" cy="58" r="6" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1.5"/>
+            <rect x="68" y="70" width="24" height="6" rx="3" fill="#1a1a2e"/>
+            <line x1="80" y1="30" x2="80" y2="40" stroke="#1a1a2e" stroke-width="2.5"/>
+            <circle cx="80" cy="26" r="5" fill="#4ecdc4" stroke="#1a1a2e" stroke-width="2"/>
+            <!-- book of rules -->
+            <rect x="115" y="50" width="40" height="50" rx="4" fill="#fff8f0" stroke="#1a1a2e" stroke-width="2.5"/>
+            <text x="135" y="72" text-anchor="middle" font-size="8" font-weight="700" fill="#ff6b35" font-family="sans-serif">RULES</text>
+            <text x="135" y="86" text-anchor="middle" font-size="7" fill="#1a1a2e" font-family="sans-serif">连连看</text>
+            <!-- match lines -->
+            <line x1="105" y1="55" x2="115" y2="60" stroke="#4ecdc4" stroke-width="2"/>
+            <line x1="105" y1="70" x2="115" y2="75" stroke="#ff6b35" stroke-width="2"/>
+            <!-- NL speech -->
+            <rect x="15" y="105" width="95" height="28" rx="8" fill="#fff" stroke="#1a1a2e" stroke-width="2"/>
+            <text x="62" y="123" text-anchor="middle" font-size="9" fill="#1a1a2e" font-family="sans-serif">「挂个 UART」→ yaml</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble">
+            Agent 读 <code>AGENTS.md</code> / 规则，再玩<strong>连连看</strong>：自然语言意图 → <code>nl_field_map</code> → 该改的 YAML 字段。
+            <span class="en">Agent-as-Elaborator: match NL, fill fields, elaborate top RTL.</span>
+          </div>
+          <p class="caption">人话进，合约出。先匹配场景，再动文件。</p>
+        </div>
+      </article>
+
+      <!-- Panel 4: validate.py gatekeeper -->
+      <article class="panel gate reverse">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">4</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- gate / checkpoint -->
+            <rect x="55" y="20" width="70" height="90" rx="8" fill="#2ecc71" stroke="#1a1a2e" stroke-width="3"/>
+            <text x="90" y="48" text-anchor="middle" font-size="11" font-weight="800" fill="#fff" font-family="sans-serif">PASS</text>
+            <circle cx="90" cy="72" r="16" fill="#fff" stroke="#1a1a2e" stroke-width="2.5"/>
+            <path d="M80 72 L87 79 L102 62" fill="none" stroke="#2ecc71" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="90" y="105" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif">validate.py</text>
+            <!-- rejected blob -->
+            <circle cx="30" cy="110" r="14" fill="#e74c3c" stroke="#1a1a2e" stroke-width="2" opacity="0.85"/>
+            <text x="30" y="114" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">✗</text>
+            <text x="30" y="138" text-anchor="middle" font-size="8" fill="#e74c3c" font-family="sans-serif">bus_role?</text>
+            <!-- happy yaml -->
+            <rect x="140" y="95" width="28" height="36" rx="4" fill="#fff" stroke="#1a1a2e" stroke-width="2"/>
+            <text x="154" y="117" text-anchor="middle" font-size="10" fill="#2ecc71" font-family="sans-serif">OK</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble right">
+            <strong>validate.py</strong> 是友善门卫：schema、bundle 闭包、bus_role 配对、fabric decode……不生成 glue HDL，只挡离谱。
+            <span class="en">Friendly gatekeeper. Thin validator — zero heavyweight engine.</span>
+          </div>
+          <p class="caption"><code>python tools/validate.py</code> —— 绿灯再 elaborator。</p>
+        </div>
+      </article>
+
+      <!-- Panel 5: fabric / adapters / bit-slice cameos -->
+      <article class="panel cameo">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">5</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- three cameo characters -->
+            <!-- fabric -->
+            <g transform="translate(15,35)">
+              <rect width="45" height="55" rx="8" fill="#4ecdc4" stroke="#1a1a2e" stroke-width="2.5"/>
+              <text x="22.5" y="28" text-anchor="middle" font-size="8" font-weight="700" fill="#1a1a2e" font-family="sans-serif">fabric</text>
+              <path d="M10 38 H35 M22 38 V48" stroke="#1a1a2e" stroke-width="2"/>
+              <circle cx="12" cy="48" r="3" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1"/>
+              <circle cx="33" cy="48" r="3" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1"/>
+            </g>
+            <!-- adapters -->
+            <g transform="translate(68,28)">
+              <rect width="45" height="55" rx="8" fill="#ff6b35" stroke="#1a1a2e" stroke-width="2.5"/>
+              <text x="22.5" y="26" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" font-family="sans-serif">adapters</text>
+              <rect x="8" y="35" width="12" height="10" rx="2" fill="#fff" stroke="#1a1a2e" stroke-width="1.5"/>
+              <rect x="25" y="35" width="12" height="10" rx="2" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1.5"/>
+              <path d="M20 40 H25" stroke="#1a1a2e" stroke-width="2"/>
+            </g>
+            <!-- bit-slice -->
+            <g transform="translate(120,40)">
+              <rect width="45" height="55" rx="8" fill="#7c5cff" stroke="#1a1a2e" stroke-width="2.5"/>
+              <text x="22.5" y="26" text-anchor="middle" font-size="7" font-weight="700" fill="#fff" font-family="sans-serif">bit-slice</text>
+              <rect x="8" y="36" width="29" height="8" rx="2" fill="#ffe66d" stroke="#1a1a2e" stroke-width="1.5"/>
+              <text x="22.5" y="55" text-anchor="middle" font-size="7" fill="#fff" font-family="sans-serif">[7:0]</text>
+            </g>
+            <text x="90" y="125" text-anchor="middle" font-size="10" fill="#1a1a2e" font-family="sans-serif" font-weight="700">⭐ cameo crew</text>
+            <text x="90" y="140" text-anchor="middle" font-size="8" fill="#5a5a72" font-family="sans-serif">PicoSoC pilot approved</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble">
+            客串明星：<strong>fabric</strong>（decode/mux）、<strong>adapters</strong>、<strong>bit-slice</strong>——校验器认得它们；PicoSoC pilot 已实装走通一圈。
+            <span class="en">Sidekicks in the schema. Pilot-tested, still not an integrator product.</span>
+          </div>
+          <p class="caption">规则包验证 ✔ · 不是把 MoonGlass 变成接线厂。</p>
+        </div>
+      </article>
+
+      <!-- Panel 6: boundary punchline -->
+      <article class="panel boundary reverse">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">6</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <!-- big X over heavy engine -->
+            <rect x="40" y="30" width="100" height="70" rx="10" fill="#eee" stroke="#1a1a2e" stroke-width="2.5" stroke-dasharray="6 4"/>
+            <text x="90" y="60" text-anchor="middle" font-size="9" fill="#5a5a72" font-family="sans-serif">Heavy</text>
+            <text x="90" y="75" text-anchor="middle" font-size="9" fill="#5a5a72" font-family="sans-serif">Integrator™</text>
+            <line x1="50" y1="35" x2="130" y2="95" stroke="#e74c3c" stroke-width="5" stroke-linecap="round"/>
+            <line x1="130" y1="35" x2="50" y2="95" stroke="#e74c3c" stroke-width="5" stroke-linecap="round"/>
+            <!-- small agent waving -->
+            <circle cx="90" cy="120" r="12" fill="#ffe66d" stroke="#1a1a2e" stroke-width="2"/>
+            <text x="90" y="125" text-anchor="middle" font-size="10" font-family="sans-serif">👋</text>
+            <text x="90" y="145" text-anchor="middle" font-size="8" fill="#1a1a2e" font-family="sans-serif" font-weight="700">Agent does it</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble right">
+            边界打卡：我们<strong>不是永久集成器</strong>。AI 可以现场写一次性 glue；本包只提供合约、规则、薄校验。
+            <span class="en">Not a permanent integrator. Invent helpers; we don't ship the factory.</span>
+          </div>
+          <p class="caption">是规则包 · 不是 FuseSoC / IP-XACT 替代品 · 不是 MoonGlass 内置接线功能。</p>
+        </div>
+      </article>
+
+      <!-- Panel 7: CTA -->
+      <article class="panel cta-panel">
+        <div class="art" aria-hidden="true">
+          <span class="panel-num">7</span>
+          <svg viewBox="0 0 180 150" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="90" cy="70" r="45" fill="#ffe66d" stroke="#1a1a2e" stroke-width="3"/>
+            <text x="90" y="62" text-anchor="middle" font-size="14" font-family="sans-serif">🚀</text>
+            <text x="90" y="85" text-anchor="middle" font-size="11" font-weight="800" fill="#1a1a2e" font-family="sans-serif">TRY IT</text>
+            <text x="90" y="130" text-anchor="middle" font-size="9" fill="#5a5a72" font-family="sans-serif">star · read · validate</text>
+          </svg>
+        </div>
+        <div class="story">
+          <div class="bubble">
+            想玩？克隆仓库 → 读说明 → 跑 <code>validate.py</code> → 对着 PicoSoC pilot 学一遍。欢迎 Star / Issue。
+            <span class="en">Clone · read the 说明 · validate · pilot. PolyForm Noncommercial (draft).</span>
+          </div>
+          <div class="cta-row" style="justify-content:flex-start;margin-top:0.25rem">
+            <a class="btn" href="https://github.com/MoonGlassAgent/MoonGlass_Intergration">GitHub</a>
+            <a class="btn secondary" href="./MoonGlass_Integration说明.html">说明文档</a>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <section class="finale">
+      <h2>继续探索 <span class="spark">✨</span></h2>
+      <p>漫画只是开胃菜——完整字段、场景与「有意未做」见说明文档。</p>
+      <div class="links-grid">
+        <a href="https://github.com/MoonGlassAgent/MoonGlass_Intergration">
+          <strong>📦 GitHub Repo</strong>
+          MoonGlass_Intergration · README
+        </a>
+        <a href="./MoonGlass_Integration说明.html">
+          <strong>📖 中文说明 HTML</strong>
+          定位 · 架构 · 连连看 · 缺口
+        </a>
+        <a href="https://github.com/MoonGlassAgent/MoonGlass_Intergration/blob/main/rules/nl_field_map.md">
+          <strong>🔗 连连看 nl_field_map</strong>
+          NL → YAML 字段地图
+        </a>
+        <a href="https://github.com/MoonGlassAgent/MoonGlass_Intergration/blob/main/pilots/picosoc/实测报告.html">
+          <strong>🧪 PicoSoC 实测报告</strong>
+          开源 SoC 试点
+        </a>
+        <a href="https://github.com/MoonGlassAgent/MoonGlass_Intergration/blob/main/AGENTS.md">
+          <strong>🤖 AGENTS.md</strong>
+          Agent 入口 brief
+        </a>
+        <a href="https://github.com/MoonGlassAgent/MoonGlass_Intergration/blob/main/tools/validate.py">
+          <strong>✅ validate.py</strong>
+          友善门卫源码
+        </a>
+      </div>
+      <div class="cta-row">
+        <a class="btn purple" href="https://github.com/MoonGlassAgent/MoonGlass_Intergration#怎么用">怎么用 · try validate</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>MoonGlass_Intergration · comic intro · License: PolyForm Noncommercial family (draft)</p>
+      <p>Made for sharing · no login · stick figures only · <code>docs/</code> on GitHub Pages</p>
+    </footer>
+  </div>
+</body>
+</html>

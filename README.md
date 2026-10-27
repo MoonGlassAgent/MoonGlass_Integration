@@ -1,5 +1,11 @@
 # MoonGlass_Integration
 
+[![Comic intro](https://img.shields.io/badge/Comic-网站介绍-ff6b35?style=for-the-badge&logo=github)](https://moonglassagent.github.io/MoonGlass_Intergration/)
+[![GitHub Pages](https://img.shields.io/badge/Pages-docs%2F-4ecdc4?style=flat-square)](https://moonglassagent.github.io/MoonGlass_Intergration/)
+
+**漫画式介绍（公开站）:** [https://moonglassagent.github.io/MoonGlass_Intergration/](https://moonglassagent.github.io/MoonGlass_Intergration/) · 源文件 `docs/index.html`
+
+
 **规则 / Schema / 约束包** —— 让任意 coding agent 靠 YAML 描述做 SoC 组装与连线。  
 **不是**集成引擎，**不是** MoonGlass 产品内的接线功能。
 
@@ -68,6 +74,7 @@ MoonGlass 适合**托住**这类规则/描述与状态；**不适合**在本包�
 
 ## 文档
 
+- [漫画介绍网站](https://moonglassagent.github.io/MoonGlass_Intergration/) — `docs/index.html` 连环画式导览（GitHub Pages）
 - [中文说明（HTML）](docs/MoonGlass_Integration说明.html) — 定位、架构、字段、场景、**连连看**、有意未做的缺口与原因
 - [连连看 NL↔字段](rules/nl_field_map.md) — 人话意图 → 必填/可选 YAML 路径（Agent 先匹配再改文件）
 - [PicoSoC pilot](pilots/picosoc/) — 用本包 YAML 重描开源 PicoSoC 顶层并校验；[实测报告](pilots/picosoc/实测报告.html)
